@@ -138,17 +138,12 @@ ul { list-style: none; }
    ═══════════════════════════════════════════════ */
 .sr { opacity: 0; transform: translateY(60px); }
 .sr-s { opacity: 0; transform: translateY(30px) scale(0.97); }
-
-/* Fallback: if JS hasn't loaded after 3s, show everything */
-@keyframes fallback-show { to { opacity: 1; transform: none; } }
-.no-js .sr, .no-js .sr-s,
-.no-js .hero-title .line-inner,
-.no-js .hero-sub,
-.no-js .hero-btns,
-.no-js .hero-stats {
-  animation: fallback-show 0.5s ease forwards;
-}
-html { --js-loaded: 0; }
+.js-ready .sr, .js-ready .sr-s { /* GSAP handles these */ }
+/* If JS never adds .js-ready, show after 2s */
+@keyframes show-fallback { to { opacity: 1; transform: none; } }
+.sr, .sr-s { animation: show-fallback 0.8s ease 2.5s forwards; }
+.hero-title .line-inner { animation: show-fallback 0.8s ease 0.5s forwards; }
+.hero-sub, .hero-btns, .hero-stats { animation: show-fallback 0.8s ease 1s forwards; }
 
 /* ═══════════════════════════════════════════════
    NAVIGATION
@@ -311,6 +306,7 @@ html { --js-loaded: 0; }
 .hero-title .line-inner {
   display: block;
   transform: translateY(110%);
+  opacity: 0;
 }
 .hero-accent { color: var(--accent); }
 .hero-sub {
@@ -1415,16 +1411,18 @@ gsap.registerPlugin(ScrollTrigger);
 
 const heroTl=gsap.timeline({defaults:{ease:'power4.out'}});
 heroTl
-  .to('.hero-title .line-inner',{y:'0%',duration:1.4,stagger:.12},0.3)
-  .to('.hero-sub',{opacity:1,y:0,duration:1},{'>-0.6'})
-  .to('.hero-btns',{opacity:1,y:0,duration:1},{'>-0.7'})
-  .to('.hero-stats',{opacity:1,y:0,duration:1},{'>-0.7'});
+  .to('.hero-title .line-inner',{y:'0%',opacity:1,duration:1.4,stagger:.12,clearProps:'animation'},0.3)
+  .to('.hero-sub',{opacity:1,y:0,duration:1,clearProps:'animation'},{'>-0.6'})
+  .to('.hero-btns',{opacity:1,y:0,duration:1,clearProps:'animation'},{'>-0.7'})
+  .to('.hero-stats',{opacity:1,y:0,duration:1,clearProps:'animation'},{'>-0.7'});
 
 // ═══ SCROLL REVEALS ═══
 gsap.utils.toArray('.sr').forEach(el=>{
+  el.style.animation='none';
   gsap.to(el,{scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'},opacity:1,y:0,duration:1,ease:'power3.out'});
 });
 gsap.utils.toArray('.sr-s').forEach(el=>{
+  el.style.animation='none';
   gsap.to(el,{scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'},opacity:1,y:0,scale:1,duration:1.2,ease:'power3.out'});
 });
 
