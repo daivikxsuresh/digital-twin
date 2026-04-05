@@ -6,1541 +6,1445 @@
 <title>Nexus Twin — Supply Chain Digital Twin Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.1/dist/lenis.min.js"></script>
 <style>
-/* ========== RESET & VARIABLES ========== */
+/* ═══════════════════════════════════════════════
+   RESET & DESIGN TOKENS
+   ═══════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg-primary: #06090f;
-  --bg-secondary: #0c1017;
-  --bg-card: #111620;
-  --bg-card-hover: #161c28;
-  --bg-surface: #1a2030;
-  --border: #1e2738;
-  --border-light: #2a3548;
-  --text-primary: #eaf0ff;
-  --text-secondary: #8892a6;
-  --text-muted: #5a6478;
-  --accent: #e04a2f;
-  --accent-light: #ff6347;
-  --accent-glow: rgba(224, 74, 47, 0.15);
-  --green: #22c55e;
-  --green-dim: rgba(34, 197, 94, 0.12);
-  --yellow: #eab308;
-  --yellow-dim: rgba(234, 179, 8, 0.12);
-  --red-dim: rgba(224, 74, 47, 0.12);
-  --blue: #3b82f6;
-  --blue-dim: rgba(59, 130, 246, 0.12);
-  --font-body: 'Inter', -apple-system, sans-serif;
-  --font-heading: 'Space Grotesk', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --radius: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --bg-0: #050a0e;
+  --bg-1: #080d12;
+  --bg-2: #0c1218;
+  --bg-3: #111922;
+  --bg-4: #16202c;
+  --bg-5: #1c2836;
+  --border-0: #151e2a;
+  --border-1: #1e2a3a;
+  --border-2: #283848;
+  --text-0: #f0f4f8;
+  --text-1: #c8d0dc;
+  --text-2: #8896a8;
+  --text-3: #5a6a7e;
+  --text-4: #3a4a5e;
+  --accent: #e8432a;
+  --accent-soft: #ff5e42;
+  --accent-glow: rgba(232,67,42,0.08);
+  --accent-glow-2: rgba(232,67,42,0.15);
+  --accent-glow-3: rgba(232,67,42,0.25);
+  --green: #34d399;
+  --green-bg: rgba(52,211,153,0.08);
+  --yellow: #fbbf24;
+  --yellow-bg: rgba(251,191,36,0.08);
+  --blue: #60a5fa;
+  --blue-bg: rgba(96,165,250,0.08);
+  --red-bg: rgba(232,67,42,0.08);
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --radius-s: 6px;
+  --radius-m: 10px;
+  --radius-l: 16px;
+  --radius-xl: 20px;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: initial; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+
 body {
-  font-family: var(--font-body);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  overflow-x: hidden;
+  font-family: var(--font);
+  background: var(--bg-0);
+  color: var(--text-0);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 a { color: inherit; text-decoration: none; }
-img { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; border: none; }
+ul { list-style: none; }
 
-/* ========== UTILITY ========== */
-.container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
-.section-label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.2em;
+/* ═══════════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════════ */
+.wrap {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 3.5rem);
+}
+
+/* ═══════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════ */
+.t-label {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
-  margin-bottom: 1rem;
+  line-height: 1;
 }
-.section-title {
-  font-family: var(--font-heading);
-  font-size: clamp(2rem, 4vw, 3rem);
+.t-display {
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+}
+.t-h1 {
+  font-size: clamp(2rem, 5vw, 3.8rem);
   font-weight: 700;
-  line-height: 1.15;
-  color: var(--text-primary);
-  margin-bottom: 1rem;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
-.section-desc {
-  font-size: 1.05rem;
-  color: var(--text-secondary);
-  max-width: 560px;
+.t-h2 {
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+.t-h3 {
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+.t-body {
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  color: var(--text-2);
   line-height: 1.7;
+  letter-spacing: -0.005em;
+}
+.t-body-sm {
+  font-size: 0.85rem;
+  color: var(--text-2);
+  line-height: 1.65;
+}
+.t-mono {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
 }
 
-/* ========== SCROLL ANIMATIONS ========== */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* ═══════════════════════════════════════════════
+   SCROLL REVEAL
+   ═══════════════════════════════════════════════ */
+.sr { opacity: 0; transform: translateY(60px); }
+.sr-s { opacity: 0; transform: translateY(30px) scale(0.97); }
 
-/* ========== NAVIGATION ========== */
+/* ═══════════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════════ */
 .nav {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
-  padding: 1rem 2rem;
+  z-index: 100;
+  padding: 0 clamp(1.25rem, 4vw, 3.5rem);
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(6, 9, 15, 0.75);
-  backdrop-filter: blur(20px);
+  background: rgba(5, 10, 14, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid transparent;
-  transition: var(--transition);
+  transition: border-color 0.5s, background 0.5s;
 }
-.nav.scrolled { border-bottom-color: var(--border); }
-.nav-brand {
+.nav.is-scrolled {
+  border-bottom-color: var(--border-0);
+  background: rgba(5, 10, 14, 0.85);
+}
+.nav-left {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
-.nav-brand-icon {
-  width: 32px;
-  height: 32px;
+.nav-mark {
+  width: 28px;
+  height: 28px;
   background: var(--accent);
-  border-radius: 6px;
+  border-radius: 5px;
   display: grid;
   place-items: center;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 0.85rem;
+  font-weight: 800;
+  font-size: 0.72rem;
   color: #fff;
-}
-.nav-brand-text {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 1rem;
   letter-spacing: -0.02em;
 }
-.nav-links {
+.nav-wordmark {
+  font-weight: 600;
+  font-size: 0.92rem;
+  letter-spacing: -0.02em;
+}
+.nav-center {
   display: flex;
   gap: 2rem;
-  list-style: none;
 }
-.nav-links a {
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-  transition: color var(--transition);
-  letter-spacing: 0.01em;
-}
-.nav-links a:hover { color: var(--text-primary); }
-.nav-cta {
+.nav-link {
+  position: relative;
   font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.55rem 1.3rem;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  border-radius: 6px;
-  transition: var(--transition);
-  cursor: pointer;
-  background: transparent;
+  font-weight: 450;
+  color: var(--text-2);
+  transition: color 0.3s;
+  letter-spacing: 0.005em;
 }
-.nav-cta:hover {
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
   background: var(--accent);
-  color: #fff;
+  border-radius: 50%;
+  transform: translateX(-50%) scale(0);
+  transition: transform 0.6s var(--ease-out);
 }
+.nav-link:hover { color: var(--text-0); }
+.nav-link:hover::after { transform: translateX(-50%) scale(1); }
+.nav-right { display: flex; align-items: center; }
+.nav-btn {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.5rem 1.2rem;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-s);
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+  transition: color 0.4s, background 0.4s;
+}
+.nav-btn:hover { background: var(--accent); color: #fff; }
 
-/* ========== HERO ========== */
+/* ═══════════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════════ */
 .hero {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   text-align: center;
+  padding: 6rem 2rem 4rem;
   overflow: hidden;
 }
-.hero-canvas {
+#heroCanvas {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  width: 100%;
+  height: 100%;
 }
-.hero-overlay {
+.hero-fade {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 0%, var(--bg-primary) 70%);
-  z-index: 1;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 45%, transparent 0%, var(--bg-0) 100%),
+    linear-gradient(to bottom, transparent 60%, var(--bg-0) 100%);
+  pointer-events: none;
 }
-.hero-content {
+.hero-inner {
   position: relative;
   z-index: 2;
-  max-width: 820px;
-  padding: 0 2rem;
+  max-width: 900px;
 }
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
+  gap: 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent);
   background: var(--accent-glow);
-  padding: 0.45rem 1.1rem;
+  border: 1px solid rgba(232,67,42,0.15);
+  padding: 0.4rem 1rem;
   border-radius: 100px;
-  border: 1px solid rgba(224, 74, 47, 0.2);
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
-.hero-badge-dot {
-  width: 6px;
-  height: 6px;
+.badge-dot {
+  width: 5px;
+  height: 5px;
   background: var(--accent);
   border-radius: 50%;
-  animation: pulse-dot 2s infinite;
+  animation: dot-pulse 2.4s ease infinite;
 }
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.8); }
 }
-.hero h1 {
-  font-family: var(--font-heading);
-  font-size: clamp(2.8rem, 6vw, 5rem);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
-  margin-bottom: 1.5rem;
+.hero-title {
+  margin-bottom: 1.8rem;
 }
-.hero h1 .accent { color: var(--accent); }
+.hero-title .line {
+  display: block;
+  overflow: hidden;
+}
+.hero-title .line-inner {
+  display: block;
+  transform: translateY(110%);
+}
+.hero-accent { color: var(--accent); }
 .hero-sub {
-  font-size: 1.15rem;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  max-width: 580px;
-  margin: 0 auto 2.5rem;
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  color: var(--text-2);
+  line-height: 1.75;
+  max-width: 560px;
+  margin: 0 auto 3rem;
+  opacity: 0;
 }
-.hero-actions {
+.hero-btns {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: center;
   flex-wrap: wrap;
+  opacity: 0;
 }
-.btn-primary {
+.btn-fill {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.8rem 2rem;
+  padding: 0.75rem 1.8rem;
   background: var(--accent);
   color: #fff;
   font-weight: 600;
-  font-size: 0.88rem;
-  border-radius: var(--radius);
-  border: none;
-  cursor: pointer;
-  transition: var(--transition);
+  font-size: 0.85rem;
+  border-radius: var(--radius-s);
+  transition: transform 0.4s var(--ease-out), background 0.3s, box-shadow 0.3s;
 }
-.btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); }
-.btn-secondary {
+.btn-fill:hover {
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(232,67,42,0.25);
+}
+.btn-ghost {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.8rem 2rem;
+  padding: 0.75rem 1.8rem;
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-2);
   font-weight: 500;
-  font-size: 0.88rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border-light);
-  cursor: pointer;
-  transition: var(--transition);
+  font-size: 0.85rem;
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-s);
+  transition: border-color 0.3s, color 0.3s, transform 0.4s var(--ease-out);
 }
-.btn-secondary:hover { border-color: var(--text-secondary); color: var(--text-primary); }
-.hero-metrics {
+.btn-ghost:hover {
+  border-color: var(--text-3);
+  color: var(--text-0);
+  transform: translateY(-2px);
+}
+.hero-stats {
   display: flex;
   justify-content: center;
-  gap: 3rem;
-  margin-top: 4rem;
+  gap: clamp(2rem, 5vw, 4rem);
+  margin-top: 5rem;
   padding-top: 3rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-0);
+  opacity: 0;
 }
-.hero-metric-val {
-  font-family: var(--font-heading);
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
+.stat-num {
+  font-size: clamp(1.4rem, 2vw, 1.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
-.hero-metric-label {
-  font-size: 0.72rem;
-  color: var(--text-muted);
+.stat-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--text-3);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-top: 0.3rem;
+  margin-top: 0.5rem;
 }
 
-/* ========== PLATFORM OVERVIEW ========== */
-.overview {
-  padding: 8rem 0;
-  border-top: 1px solid var(--border);
+/* ═══════════════════════════════════════════════
+   SECTION DIVIDER
+   ═══════════════════════════════════════════════ */
+.divider {
+  height: 1px;
+  background: var(--border-0);
 }
+
+/* ═══════════════════════════════════════════════
+   OVERVIEW
+   ═══════════════════════════════════════════════ */
+.overview {
+  padding: clamp(5rem, 10vw, 10rem) 0;
+}
+.overview-head {
+  max-width: 680px;
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+.overview-head .t-label { margin-bottom: 1.2rem; }
+.overview-head .t-h1 { margin-bottom: 1.2rem; }
 .overview-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin-top: 3.5rem;
+  gap: 1px;
+  background: var(--border-0);
+  border: 1px solid var(--border-0);
+  border-radius: var(--radius-l);
+  overflow: hidden;
 }
-.overview-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 2rem;
-  transition: var(--transition);
+.ov-card {
+  background: var(--bg-1);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  transition: background 0.5s;
 }
-.overview-card:hover {
-  background: var(--bg-card-hover);
-  border-color: var(--border-light);
-  transform: translateY(-2px);
-}
-.overview-card-icon {
+.ov-card:hover { background: var(--bg-2); }
+.ov-icon {
   width: 40px;
   height: 40px;
-  border-radius: var(--radius);
+  border-radius: var(--radius-s);
   display: grid;
   place-items: center;
-  font-size: 1.1rem;
-  margin-bottom: 1.2rem;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  transition: transform 0.5s var(--ease-out);
 }
-.oci-red { background: var(--red-dim); color: var(--accent); }
-.oci-green { background: var(--green-dim); color: var(--green); }
-.oci-blue { background: var(--blue-dim); color: var(--blue); }
-.oci-yellow { background: var(--yellow-dim); color: var(--yellow); }
-.overview-card h3 {
-  font-family: var(--font-heading);
+.ov-card:hover .ov-icon { transform: translateY(-3px); }
+.ov-icon-r { background: var(--red-bg); color: var(--accent); }
+.ov-icon-g { background: var(--green-bg); color: var(--green); }
+.ov-icon-b { background: var(--blue-bg); color: var(--blue); }
+.ov-icon-y { background: var(--yellow-bg); color: var(--yellow); }
+.ov-card h3 {
   font-size: 1.05rem;
   font-weight: 600;
-  margin-bottom: 0.6rem;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.7rem;
 }
-.overview-card p {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+.ov-card p {
+  font-size: 0.82rem;
+  color: var(--text-2);
   line-height: 1.65;
 }
 
-/* ========== DIGITAL TWIN DEMO ========== */
+/* ═══════════════════════════════════════════════
+   STATS MARQUEE
+   ═══════════════════════════════════════════════ */
+.marquee-section {
+  padding: 3.5rem 0;
+  border-top: 1px solid var(--border-0);
+  border-bottom: 1px solid var(--border-0);
+  overflow: hidden;
+  background: var(--bg-1);
+}
+.marquee-track {
+  display: flex;
+  gap: 4rem;
+  animation: marquee 30s linear infinite;
+  width: max-content;
+}
+.marquee-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  white-space: nowrap;
+}
+.marquee-item .mi-num {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.marquee-item .mi-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.marquee-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ═══════════════════════════════════════════════
+   DIGITAL TWIN DEMO
+   ═══════════════════════════════════════════════ */
 .twin-section {
-  padding: 6rem 0 4rem;
-  border-top: 1px solid var(--border);
-  background: var(--bg-secondary);
+  padding: clamp(5rem, 10vw, 10rem) 0;
+  background: var(--bg-0);
 }
-.twin-header {
+.twin-head {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
-.twin-header .section-desc { margin: 0 auto; }
+.twin-head .t-label { margin-bottom: 1.2rem; }
+.twin-head .t-h1 { margin-bottom: 1rem; }
+.twin-head .t-body { max-width: 520px; margin: 0 auto; }
 
 .twin-app {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--bg-1);
+  border: 1px solid var(--border-0);
   border-radius: var(--radius-xl);
   overflow: hidden;
+  box-shadow:
+    0 0 0 1px var(--border-0),
+    0 4px 24px rgba(0,0,0,0.2),
+    0 24px 80px rgba(0,0,0,0.3);
 }
-.twin-toolbar {
+
+/* Toolbar */
+.tb {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.8rem 1.5rem;
-  border-bottom: 1px solid var(--border);
-  background: rgba(17, 22, 32, 0.8);
+  padding: 0.65rem 1.25rem;
+  border-bottom: 1px solid var(--border-0);
+  background: var(--bg-2);
 }
-.twin-toolbar-left {
+.tb-left { display: flex; align-items: center; gap: 0.8rem; }
+.tb-dots { display: flex; gap: 5px; }
+.tb-dots i {
+  width: 10px; height: 10px; border-radius: 50%;
+  display: block;
+}
+.tb-dots i:nth-child(1) { background: #ef4444; }
+.tb-dots i:nth-child(2) { background: #fbbf24; }
+.tb-dots i:nth-child(3) { background: #34d399; }
+.tb-url {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--text-4);
+  letter-spacing: 0.02em;
+}
+.tb-status {
   display: flex;
   align-items: center;
-  gap: 1rem;
-}
-.twin-toolbar-dots {
-  display: flex;
-  gap: 6px;
-}
-.twin-toolbar-dots span {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--border-light);
-}
-.twin-toolbar-dots span:first-child { background: #ef4444; }
-.twin-toolbar-dots span:nth-child(2) { background: #eab308; }
-.twin-toolbar-dots span:last-child { background: #22c55e; }
-.twin-toolbar-title {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-.twin-toolbar-status {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
+  gap: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.65rem;
   color: var(--green);
+  letter-spacing: 0.03em;
 }
-.twin-toolbar-status::before {
+.tb-status::before {
   content: '';
-  width: 6px;
-  height: 6px;
+  width: 5px; height: 5px;
   background: var(--green);
   border-radius: 50%;
-  animation: pulse-dot 2s infinite;
+  animation: dot-pulse 2.4s ease infinite;
 }
 
+/* Main body */
 .twin-body {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  min-height: 560px;
+  grid-template-columns: 1fr 320px;
+  min-height: 520px;
 }
 
-/* Network Canvas */
-.twin-network {
+/* Network */
+.net-wrap {
   position: relative;
-  padding: 2rem;
-  border-right: 1px solid var(--border);
-  overflow: hidden;
+  border-right: 1px solid var(--border-0);
+  padding: 1.5rem;
 }
-.twin-network svg {
-  width: 100%;
-  height: 100%;
-}
-.node-group { cursor: pointer; }
-.node-group:hover .node-ring { opacity: 1; }
-.node-circle {
-  transition: var(--transition);
-}
-.node-ring {
-  opacity: 0;
-  transition: var(--transition);
-}
-.node-label {
-  font-family: var(--font-body);
-  font-size: 10px;
-  fill: var(--text-secondary);
+.net-wrap svg { width: 100%; height: 100%; }
+.n-grp { cursor: pointer; }
+.n-grp:hover .n-ring { opacity: 0.6 !important; }
+.n-circle { transition: all 0.4s var(--ease-out); }
+.n-ring { opacity: 0; transition: opacity 0.4s; }
+.n-label {
+  font-family: var(--font);
+  font-size: 9.5px;
+  font-weight: 500;
+  fill: var(--text-2);
   text-anchor: middle;
 }
-.node-type-label {
-  font-family: var(--font-mono);
+.n-col-label {
+  font-family: var(--mono);
   font-size: 8px;
-  fill: var(--text-muted);
+  font-weight: 600;
+  fill: var(--text-4);
   text-anchor: middle;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
 }
-.edge-line {
-  stroke: var(--border-light);
+.edge { stroke: var(--border-1); stroke-width: 1; fill: none; }
+.edge-glow {
+  stroke: var(--accent);
   stroke-width: 1.5;
   fill: none;
+  opacity: 0.35;
+  stroke-dasharray: 5 4;
+  animation: e-flow 1.8s linear infinite;
 }
-.edge-flow {
-  stroke: var(--accent);
-  stroke-width: 2;
-  fill: none;
-  opacity: 0.5;
-  stroke-dasharray: 6 4;
-  animation: flow-dash 1.5s linear infinite;
-}
-@keyframes flow-dash {
-  to { stroke-dashoffset: -10; }
-}
+@keyframes e-flow { to { stroke-dashoffset: -9; } }
 
 /* KPI Panel */
-.twin-panel {
-  padding: 1.5rem;
+.kpi-panel {
+  padding: 1.25rem;
   overflow-y: auto;
-  max-height: 560px;
+  max-height: 520px;
 }
-.panel-section-title {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 0.8rem;
-  margin-top: 1.5rem;
-}
-.panel-section-title:first-child { margin-top: 0; }
-.kpi-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.6rem;
-}
-.kpi-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.8rem;
-  transition: var(--transition);
-}
-.kpi-card-label {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  margin-bottom: 0.3rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.kpi-card-value {
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-.kpi-card-change {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  margin-top: 0.2rem;
-}
-.kpi-up { color: var(--green); }
-.kpi-down { color: var(--accent); }
-.kpi-neutral { color: var(--yellow); }
-
-.node-detail-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem;
-  margin-bottom: 0.8rem;
-}
-.node-detail-name {
-  font-family: var(--font-heading);
+.kpi-panel::-webkit-scrollbar { width: 3px; }
+.kpi-panel::-webkit-scrollbar-track { background: transparent; }
+.kpi-panel::-webkit-scrollbar-thumb { background: var(--border-1); border-radius: 10px; }
+.ps-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
   font-weight: 600;
-  font-size: 0.95rem;
-  margin-bottom: 0.15rem;
-}
-.node-detail-type {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--accent);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  color: var(--text-4);
+  margin-bottom: 0.65rem;
+  margin-top: 1.25rem;
 }
-.node-detail-stats {
+.ps-label:first-child { margin-top: 0; }
+.kpi-g {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
-  margin-top: 0.8rem;
 }
-.node-stat-label {
-  font-size: 0.65rem;
-  color: var(--text-muted);
+.kpi-c {
+  background: var(--bg-3);
+  border: 1px solid var(--border-0);
+  border-radius: var(--radius-s);
+  padding: 0.7rem 0.75rem;
+  transition: border-color 0.3s;
 }
-.node-stat-value {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
+.kpi-c:hover { border-color: var(--border-2); }
+.kpi-c-label {
+  font-size: 0.62rem;
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--text-4);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+}
+.kpi-c-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.kpi-c-chg {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  margin-top: 0.2rem;
+}
+.chg-up { color: var(--green); }
+.chg-dn { color: var(--accent); }
+.chg-w { color: var(--yellow); }
+
+/* Node Detail */
+.nd-card {
+  background: var(--bg-3);
+  border: 1px solid var(--border-0);
+  border-radius: var(--radius-s);
+  padding: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+.nd-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.1rem;
+}
+.nd-type {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.nd-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+}
+.nd-s-lbl {
+  font-size: 0.6rem;
+  color: var(--text-4);
+  font-weight: 500;
+}
+.nd-s-val {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 500;
 }
 
-/* Scenario Controls */
-.twin-controls {
-  border-top: 1px solid var(--border);
-  padding: 1.5rem 2rem;
-  background: rgba(17, 22, 32, 0.5);
+/* Controls */
+.tw-ctrl {
+  border-top: 1px solid var(--border-0);
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-2);
 }
-.controls-header {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
+.tw-ctrl-head {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 1rem;
+  color: var(--text-4);
+  margin-bottom: 0.85rem;
 }
-.controls-grid {
+.ctrl-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
-.control-item label {
-  display: block;
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
+.ctrl-item label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 0.45rem;
+}
+.ctrl-val {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--accent);
   font-weight: 500;
 }
-.control-item .control-val {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--accent);
-  float: right;
-}
-.control-item input[type="range"] {
+input[type="range"] {
   width: 100%;
-  height: 4px;
+  height: 3px;
   -webkit-appearance: none;
   appearance: none;
-  background: var(--border-light);
+  background: var(--border-1);
   border-radius: 2px;
   outline: none;
+  transition: background 0.2s;
 }
-.control-item input[type="range"]::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 12px; height: 12px;
   border-radius: 50%;
   background: var(--accent);
+  border: 2px solid var(--bg-0);
   cursor: pointer;
-  border: 2px solid var(--bg-primary);
+  transition: transform 0.3s var(--ease-out);
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.3);
 }
 
-/* Charts Section */
-.twin-charts {
-  border-top: 1px solid var(--border);
-  padding: 1.5rem 2rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-.chart-container {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.2rem;
-}
-.chart-title {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 1rem;
-}
-.chart-canvas-wrap {
-  position: relative;
-  height: 200px;
-}
-.chart-canvas-wrap canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* ========== CONNECTORS ========== */
-.connectors {
-  padding: 8rem 0;
-  border-top: 1px solid var(--border);
-}
-.connectors-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  margin-top: 3rem;
-  align-items: center;
-}
-.connector-cards {
+/* Charts */
+.tw-charts {
+  border-top: 1px solid var(--border-0);
+  padding: 1.25rem 1.5rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
-.connector-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  text-align: center;
-  transition: var(--transition);
+.chart-box {
+  background: var(--bg-3);
+  border: 1px solid var(--border-0);
+  border-radius: var(--radius-m);
+  padding: 1rem;
 }
-.connector-card:hover {
-  border-color: var(--border-light);
-  transform: translateY(-2px);
-}
-.connector-icon {
-  font-size: 1.8rem;
-  margin-bottom: 0.8rem;
-}
-.connector-name {
-  font-family: var(--font-heading);
+.chart-title {
+  font-family: var(--mono);
+  font-size: 0.6rem;
   font-weight: 600;
-  font-size: 0.88rem;
-  margin-bottom: 0.3rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-4);
+  margin-bottom: 0.75rem;
 }
-.connector-desc {
+.chart-wrap { position: relative; height: 180px; }
+.chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+/* ═══════════════════════════════════════════════
+   FEATURE CARDS (alternating)
+   ═══════════════════════════════════════════════ */
+.features { padding: clamp(5rem, 10vw, 10rem) 0; }
+.feat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+  margin-bottom: clamp(4rem, 8vw, 8rem);
+}
+.feat-row:last-child { margin-bottom: 0; }
+.feat-row.reverse .feat-text { order: 2; }
+.feat-row.reverse .feat-visual { order: 1; }
+.feat-text .t-label { margin-bottom: 1rem; }
+.feat-text .t-h2 { margin-bottom: 1rem; }
+.feat-text .t-body { margin-bottom: 1.5rem; }
+.feat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.feat-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+.feat-check {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  background: var(--accent-glow);
+  border-radius: 3px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-size: 0.6rem;
+  margin-top: 2px;
+}
+.feat-visual {
+  background: var(--bg-2);
+  border: 1px solid var(--border-0);
+  border-radius: var(--radius-l);
+  padding: 2rem;
+  min-height: 340px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.feat-visual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 50%, var(--accent-glow) 0%, transparent 60%);
+  pointer-events: none;
+}
+.fv-code {
+  font-family: var(--mono);
   font-size: 0.72rem;
-  color: var(--text-muted);
-  line-height: 1.5;
+  line-height: 1.9;
+  color: var(--text-2);
+  position: relative;
+  z-index: 1;
+  text-align: left;
+  width: 100%;
 }
-.connector-status {
+.fv-code .ck { color: var(--accent); }
+.fv-code .cs { color: var(--green); }
+.fv-code .cc { color: var(--text-4); }
+.fv-code .cb { color: var(--text-3); }
+
+/* ═══════════════════════════════════════════════
+   CONNECTORS
+   ═══════════════════════════════════════════════ */
+.connectors {
+  padding: clamp(5rem, 10vw, 10rem) 0;
+  border-top: 1px solid var(--border-0);
+}
+.conn-head {
+  text-align: center;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+.conn-head .t-label { margin-bottom: 1.2rem; }
+.conn-head .t-h1 { margin-bottom: 1rem; }
+.conn-head .t-body { max-width: 520px; margin: 0 auto; }
+.conn-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border-0);
+  border: 1px solid var(--border-0);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+}
+.conn-card {
+  background: var(--bg-1);
+  padding: clamp(1.5rem, 2.5vw, 2.2rem);
+  text-align: center;
+  transition: background 0.4s;
+}
+.conn-card:hover { background: var(--bg-2); }
+.conn-ico {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+}
+.conn-card h4 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.01em;
+}
+.conn-card p {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  line-height: 1.55;
+  margin-bottom: 0.7rem;
+}
+.conn-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  margin-top: 0.6rem;
-  padding: 0.2rem 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.55rem;
   border-radius: 100px;
 }
-.status-ready {
-  background: var(--green-dim);
-  color: var(--green);
-}
-.status-coming {
-  background: var(--yellow-dim);
-  color: var(--yellow);
-}
-.connectors-info h3 {
-  font-family: var(--font-heading);
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  line-height: 1.2;
-}
-.connectors-info p {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: 1.5rem;
-}
-.connector-feature {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-.connector-feature-icon {
-  width: 24px;
-  height: 24px;
-  background: var(--accent-glow);
-  border-radius: 4px;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  color: var(--accent);
-  font-size: 0.7rem;
-  margin-top: 2px;
-}
-.connector-feature-text {
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-.connector-feature-text strong {
-  color: var(--text-primary);
-}
+.cb-ready { background: var(--green-bg); color: var(--green); }
+.cb-soon { background: var(--yellow-bg); color: var(--yellow); }
 
-/* Code Block */
-.code-block {
-  background: #0a0d13;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.2rem 1.5rem;
-  margin-top: 2rem;
-  overflow-x: auto;
-}
-.code-block pre {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  line-height: 1.8;
-  color: var(--text-secondary);
-}
-.code-block .code-comment { color: var(--text-muted); }
-.code-block .code-key { color: var(--accent); }
-.code-block .code-string { color: var(--green); }
-.code-block .code-bracket { color: var(--text-muted); }
-
-/* ========== CTA ========== */
-.cta-section {
-  padding: 8rem 0;
-  border-top: 1px solid var(--border);
+/* ═══════════════════════════════════════════════
+   CTA
+   ═══════════════════════════════════════════════ */
+.cta {
+  padding: clamp(6rem, 12vw, 12rem) 0;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
-.cta-section .section-desc { margin: 0 auto 2rem; }
+.cta::before {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--accent-glow-2) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.cta-inner {
+  position: relative;
+  z-index: 1;
+}
+.cta .t-label { margin-bottom: 1.2rem; }
+.cta .t-h1 { margin-bottom: 1.2rem; }
+.cta .t-body { max-width: 480px; margin: 0 auto 2.5rem; }
 
-/* ========== FOOTER ========== */
+/* ═══════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════ */
 .footer {
-  padding: 2rem;
-  border-top: 1px solid var(--border);
-  text-align: center;
+  border-top: 1px solid var(--border-0);
+  padding: 5rem 0 2rem;
+  background: var(--bg-1);
 }
-.footer p {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+.footer-brand .nav-left { margin-bottom: 1.2rem; }
+.footer-brand p {
+  font-size: 0.82rem;
+  color: var(--text-3);
+  line-height: 1.6;
+  max-width: 260px;
+}
+.footer-col-title {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-4);
+  margin-bottom: 1rem;
+}
+.footer-col a {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-2);
+  padding: 0.3rem 0;
+  transition: color 0.3s;
+}
+.footer-col a:hover { color: var(--accent); }
+.footer-bottom {
+  border-top: 1px solid var(--border-0);
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-copy {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--text-4);
+  letter-spacing: 0.04em;
 }
 
-/* ========== RESPONSIVE ========== */
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   .twin-body { grid-template-columns: 1fr; }
-  .twin-panel { max-height: none; border-top: 1px solid var(--border); }
-  .controls-grid { grid-template-columns: 1fr 1fr; }
-  .twin-charts { grid-template-columns: 1fr; }
+  .kpi-panel { max-height: none; border-top: 1px solid var(--border-0); }
+  .ctrl-grid { grid-template-columns: 1fr 1fr; }
+  .tw-charts { grid-template-columns: 1fr; }
+  .feat-row { grid-template-columns: 1fr; }
+  .feat-row.reverse .feat-text { order: 1; }
+  .feat-row.reverse .feat-visual { order: 2; }
+  .conn-grid { grid-template-columns: 1fr 1fr; }
+  .footer-top { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 768px) {
-  .nav-links { display: none; }
+  .nav-center { display: none; }
   .overview-grid { grid-template-columns: 1fr; }
-  .connectors-grid { grid-template-columns: 1fr; }
-  .hero-metrics { flex-direction: column; gap: 1.5rem; }
-  .controls-grid { grid-template-columns: 1fr; }
-  .connector-cards { grid-template-columns: 1fr; }
+  .hero-stats { flex-direction: column; gap: 1.5rem; align-items: center; }
+  .ctrl-grid { grid-template-columns: 1fr; }
+  .conn-grid { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+  .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
 }
 </style>
 </head>
 <body>
 
-<!-- ====== NAVIGATION ====== -->
+<!-- ═══ NAV ═══ -->
 <nav class="nav" id="nav">
-  <a class="nav-brand" href="#">
-    <div class="nav-brand-icon">N</div>
-    <span class="nav-brand-text">Nexus Twin</span>
-  </a>
-  <ul class="nav-links">
-    <li><a href="#overview">Platform</a></li>
-    <li><a href="#twin">Digital Twin</a></li>
-    <li><a href="#connectors">Connectors</a></li>
-    <li><a href="#cta">Contact</a></li>
+  <div class="nav-left">
+    <div class="nav-mark">N</div>
+    <span class="nav-wordmark">Nexus Twin</span>
+  </div>
+  <ul class="nav-center">
+    <li><a class="nav-link" href="#overview">Platform</a></li>
+    <li><a class="nav-link" href="#twin">Digital Twin</a></li>
+    <li><a class="nav-link" href="#features">Architecture</a></li>
+    <li><a class="nav-link" href="#connectors">Connectors</a></li>
   </ul>
-  <button class="nav-cta" onclick="document.getElementById('twin').scrollIntoView({behavior:'smooth'})">Launch Demo</button>
+  <div class="nav-right">
+    <button class="nav-btn" onclick="document.getElementById('twin').scrollIntoView()">Launch Demo</button>
+  </div>
 </nav>
 
-<!-- ====== HERO ====== -->
-<section class="hero" id="hero">
-  <canvas class="hero-canvas" id="heroCanvas"></canvas>
-  <div class="hero-overlay"></div>
-  <div class="hero-content">
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-fade"></div>
+  <div class="hero-inner">
     <div class="hero-badge">
-      <span class="hero-badge-dot"></span>
-      Supply Chain Intelligence
+      <span class="badge-dot"></span>
+      Supply Chain Intelligence Platform
     </div>
-    <h1>Your supply chain,<br><span class="accent">mirrored in real time.</span></h1>
-    <p class="hero-sub">Nexus Twin builds a living digital replica of your operations — from supplier to shelf. Simulate scenarios, spot disruptions before they hit, and make decisions with full visibility.</p>
-    <div class="hero-actions">
-      <button class="btn-primary" onclick="document.getElementById('twin').scrollIntoView({behavior:'smooth'})">Explore the Twin &darr;</button>
-      <button class="btn-secondary" onclick="document.getElementById('connectors').scrollIntoView({behavior:'smooth'})">How It Connects</button>
+    <h1 class="t-display hero-title">
+      <span class="line"><span class="line-inner">Your supply chain,</span></span>
+      <span class="line"><span class="line-inner"><span class="hero-accent">mirrored in real time.</span></span></span>
+    </h1>
+    <p class="hero-sub">Nexus Twin builds a living digital replica of your operations — from supplier to shelf. Simulate disruptions before they hit. Make decisions with full operational visibility.</p>
+    <div class="hero-btns">
+      <a class="btn-fill" href="#twin">Explore the Twin <span>&darr;</span></a>
+      <a class="btn-ghost" href="#connectors">How It Connects</a>
     </div>
-    <div class="hero-metrics">
-      <div><div class="hero-metric-val">98.4%</div><div class="hero-metric-label">Avg Fill Rate</div></div>
-      <div><div class="hero-metric-val">2.3x</div><div class="hero-metric-label">Faster Response</div></div>
-      <div><div class="hero-metric-val">-34%</div><div class="hero-metric-label">Carrying Cost</div></div>
-      <div><div class="hero-metric-val">15 min</div><div class="hero-metric-label">Scenario Runtime</div></div>
+    <div class="hero-stats">
+      <div><div class="stat-num">98.4%</div><div class="stat-label">Avg Fill Rate</div></div>
+      <div><div class="stat-num">2.3x</div><div class="stat-label">Faster Response</div></div>
+      <div><div class="stat-num">&minus;34%</div><div class="stat-label">Carrying Cost</div></div>
+      <div><div class="stat-num">15 min</div><div class="stat-label">Scenario Runtime</div></div>
     </div>
   </div>
 </section>
 
-<!-- ====== PLATFORM OVERVIEW ====== -->
+<!-- ═══ MARQUEE ═══ -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="mi-num">16</span><span class="mi-label">Active SKUs</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">6</span><span class="mi-label">Suppliers</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">2</span><span class="mi-label">Warehouses</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">5</span><span class="mi-label">Customer Regions</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">1,284</span><span class="mi-label">Units / Day</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">$42.1K</span><span class="mi-label">Monthly Carrying Cost</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">91.7%</span><span class="mi-label">On-Time Delivery</span></div>
+    <div class="marquee-dot"></div>
+    <!-- duplicate for seamless loop -->
+    <div class="marquee-item"><span class="mi-num">16</span><span class="mi-label">Active SKUs</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">6</span><span class="mi-label">Suppliers</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">2</span><span class="mi-label">Warehouses</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">5</span><span class="mi-label">Customer Regions</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">1,284</span><span class="mi-label">Units / Day</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">$42.1K</span><span class="mi-label">Monthly Carrying Cost</span></div>
+    <div class="marquee-dot"></div>
+    <div class="marquee-item"><span class="mi-num">91.7%</span><span class="mi-label">On-Time Delivery</span></div>
+    <div class="marquee-dot"></div>
+  </div>
+</div>
+
+<!-- ═══ OVERVIEW ═══ -->
 <section class="overview" id="overview">
-  <div class="container">
-    <div class="reveal">
-      <div class="section-label">// Platform</div>
-      <div class="section-title">One pane of glass for<br>your entire network.</div>
-      <div class="section-desc">Nexus Twin unifies supplier performance, warehouse flow, and customer demand into a single operational model. Built for SMBs who need enterprise-grade visibility without enterprise-grade budgets.</div>
+  <div class="wrap">
+    <div class="overview-head sr">
+      <div class="t-label">// Platform</div>
+      <h2 class="t-h1">One pane of glass for<br>your entire network.</h2>
+      <p class="t-body">Nexus Twin unifies supplier performance, warehouse flow, and customer demand into a single operational model. Built for SMBs who need enterprise-grade visibility.</p>
     </div>
-    <div class="overview-grid reveal">
-      <div class="overview-card">
-        <div class="overview-card-icon oci-red">&#9673;</div>
+    <div class="overview-grid sr-s">
+      <div class="ov-card">
+        <div class="ov-icon ov-icon-r">&#9673;</div>
         <h3>Network Topology</h3>
-        <p>Visualize every node in your supply chain — suppliers, warehouses, distribution centers, and end customers — as an interactive, real-time graph.</p>
+        <p>Visualize every node — suppliers, warehouses, distribution, customers — as a real-time interactive graph.</p>
       </div>
-      <div class="overview-card">
-        <div class="overview-card-icon oci-green">&#9651;</div>
+      <div class="ov-card">
+        <div class="ov-icon ov-icon-g">&#9651;</div>
         <h3>Scenario Simulation</h3>
-        <p>Model demand spikes, supplier delays, labor shortages, and reorder policy changes. See downstream impacts instantly without touching real operations.</p>
+        <p>Model demand spikes, supplier delays, labor shortages. See downstream impacts without touching live ops.</p>
       </div>
-      <div class="overview-card">
-        <div class="overview-card-icon oci-blue">&#9632;</div>
+      <div class="ov-card">
+        <div class="ov-icon ov-icon-b">&#9632;</div>
         <h3>Predictive KPIs</h3>
-        <p>Track fill rate, throughput, carrying cost, stockout risk, and lead time variance across every node with automated anomaly detection.</p>
+        <p>Track fill rate, throughput, carrying cost, stockout risk with automated anomaly detection.</p>
       </div>
-      <div class="overview-card">
-        <div class="overview-card-icon oci-yellow">&#9830;</div>
+      <div class="ov-card">
+        <div class="ov-icon ov-icon-y">&#9830;</div>
         <h3>Inventory Intelligence</h3>
-        <p>Optimize reorder points and safety stock dynamically based on actual demand patterns, lead time variability, and service level targets.</p>
+        <p>Optimize reorder points dynamically based on demand patterns and service level targets.</p>
       </div>
-      <div class="overview-card">
-        <div class="overview-card-icon oci-red">&#8644;</div>
+      <div class="ov-card">
+        <div class="ov-icon ov-icon-r">&#8644;</div>
         <h3>Plug-and-Play Data</h3>
-        <p>Connect your ERP, upload Excel/CSV, or push data via API. Nexus adapts to your data — not the other way around.</p>
+        <p>Connect your ERP, upload Excel, or push via API. Nexus adapts to your data.</p>
       </div>
-      <div class="overview-card">
-        <div class="overview-card-icon oci-green">&#9878;</div>
+      <div class="ov-card">
+        <div class="ov-icon ov-icon-g">&#9878;</div>
         <h3>Multi-Vertical Ready</h3>
-        <p>Supply chain is the first twin. Nexus is architectured to support warehousing, manufacturing, logistics, and retail twins on the same platform.</p>
+        <p>Supply chain first. Warehousing, manufacturing, logistics twins on the same platform.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ====== DIGITAL TWIN DEMO ====== -->
+<!-- ═══ DIGITAL TWIN ═══ -->
 <section class="twin-section" id="twin">
-  <div class="container">
-    <div class="twin-header reveal">
-      <div class="section-label">// Interactive Demo</div>
-      <div class="section-title">See the twin in action.</div>
-      <div class="section-desc">Click any node to inspect its KPIs. Adjust the scenario sliders to simulate disruptions and watch the network respond in real time.</div>
+  <div class="wrap">
+    <div class="twin-head sr">
+      <div class="t-label">// Interactive Demo</div>
+      <h2 class="t-h1">See the twin in action.</h2>
+      <p class="t-body">Click any node to inspect KPIs. Adjust scenario sliders to simulate disruptions and watch the network respond.</p>
     </div>
-
-    <div class="twin-app reveal">
-      <!-- Toolbar -->
-      <div class="twin-toolbar">
-        <div class="twin-toolbar-left">
-          <div class="twin-toolbar-dots"><span></span><span></span><span></span></div>
-          <span class="twin-toolbar-title">nexus-twin://smb-demo/live</span>
+    <div class="twin-app sr-s">
+      <div class="tb">
+        <div class="tb-left">
+          <div class="tb-dots"><i></i><i></i><i></i></div>
+          <span class="tb-url">nexus://twin/smb-demo/live</span>
         </div>
-        <div class="twin-toolbar-status">Simulation Active</div>
+        <div class="tb-status">Simulation Active</div>
       </div>
-
-      <!-- Main Body -->
       <div class="twin-body">
-        <!-- Network Visualization -->
-        <div class="twin-network" id="networkContainer">
-          <svg id="networkSvg" viewBox="0 0 700 500"></svg>
-        </div>
-        <!-- KPI Panel -->
-        <div class="twin-panel" id="kpiPanel">
-          <div class="panel-section-title">System Overview</div>
-          <div class="kpi-grid" id="systemKpis">
-            <div class="kpi-card"><div class="kpi-card-label">Fill Rate</div><div class="kpi-card-value" id="kpi-fillRate">96.2%</div><div class="kpi-card-change kpi-up">+1.3%</div></div>
-            <div class="kpi-card"><div class="kpi-card-label">Throughput</div><div class="kpi-card-value" id="kpi-throughput">1,284</div><div class="kpi-card-change kpi-up">units/day</div></div>
-            <div class="kpi-card"><div class="kpi-card-label">Carrying Cost</div><div class="kpi-card-value" id="kpi-carryingCost">$42.1K</div><div class="kpi-card-change kpi-down">+2.8%</div></div>
-            <div class="kpi-card"><div class="kpi-card-label">Stockout Risk</div><div class="kpi-card-value" id="kpi-stockoutRisk">4.1%</div><div class="kpi-card-change kpi-neutral">moderate</div></div>
+        <div class="net-wrap" id="netWrap"><svg id="netSvg" viewBox="0 0 700 500"></svg></div>
+        <div class="kpi-panel" id="kpiPanel">
+          <div class="ps-label">System Overview</div>
+          <div class="kpi-g">
+            <div class="kpi-c"><div class="kpi-c-label">Fill Rate</div><div class="kpi-c-val" id="k-fill">96.2%</div><div class="kpi-c-chg chg-up">+1.3%</div></div>
+            <div class="kpi-c"><div class="kpi-c-label">Throughput</div><div class="kpi-c-val" id="k-tp">1,284</div><div class="kpi-c-chg chg-up">units/day</div></div>
+            <div class="kpi-c"><div class="kpi-c-label">Carrying Cost</div><div class="kpi-c-val" id="k-cc">$42.1K</div><div class="kpi-c-chg chg-dn">+2.8%</div></div>
+            <div class="kpi-c"><div class="kpi-c-label">Stockout Risk</div><div class="kpi-c-val" id="k-sr">4.1%</div><div class="kpi-c-chg chg-w">moderate</div></div>
           </div>
-
-          <div id="nodeDetail" style="display:none;">
-            <div class="panel-section-title">Selected Node</div>
-            <div class="node-detail-card">
-              <div class="node-detail-name" id="nodeDetailName"></div>
-              <div class="node-detail-type" id="nodeDetailType"></div>
-              <div class="node-detail-stats" id="nodeDetailStats"></div>
+          <div id="nodeDetail" style="display:none">
+            <div class="ps-label">Selected Node</div>
+            <div class="nd-card">
+              <div class="nd-name" id="ndName"></div>
+              <div class="nd-type" id="ndType"></div>
+              <div class="nd-stats" id="ndStats"></div>
             </div>
           </div>
-
-          <div class="panel-section-title">Network Health</div>
-          <div class="kpi-grid">
-            <div class="kpi-card"><div class="kpi-card-label">Avg Lead Time</div><div class="kpi-card-value" id="kpi-leadTime">8.4d</div></div>
-            <div class="kpi-card"><div class="kpi-card-label">On-Time %</div><div class="kpi-card-value" id="kpi-onTime">91.7%</div></div>
-            <div class="kpi-card"><div class="kpi-card-label">Active SKUs</div><div class="kpi-card-value" id="kpi-activeSKUs">16</div></div>
-            <div class="kpi-card"><div class="kpi-card-label">Util Rate</div><div class="kpi-card-value" id="kpi-utilRate">73%</div></div>
+          <div class="ps-label">Network Health</div>
+          <div class="kpi-g">
+            <div class="kpi-c"><div class="kpi-c-label">Avg Lead Time</div><div class="kpi-c-val" id="k-lt">8.4d</div></div>
+            <div class="kpi-c"><div class="kpi-c-label">On-Time %</div><div class="kpi-c-val" id="k-ot">91.7%</div></div>
+            <div class="kpi-c"><div class="kpi-c-label">Active SKUs</div><div class="kpi-c-val" id="k-sku">16</div></div>
+            <div class="kpi-c"><div class="kpi-c-label">Util Rate</div><div class="kpi-c-val" id="k-ur">73%</div></div>
           </div>
         </div>
       </div>
-
-      <!-- Scenario Controls -->
-      <div class="twin-controls">
-        <div class="controls-header">Scenario Controls</div>
-        <div class="controls-grid">
-          <div class="control-item">
-            <label>Demand Volume <span class="control-val" id="val-demand">100%</span></label>
-            <input type="range" min="50" max="200" value="100" id="ctrl-demand" oninput="updateScenario()">
+      <div class="tw-ctrl">
+        <div class="tw-ctrl-head">Scenario Controls</div>
+        <div class="ctrl-grid">
+          <div class="ctrl-item">
+            <label>Demand Volume <span class="ctrl-val" id="v-dem">100%</span></label>
+            <input type="range" min="50" max="200" value="100" id="c-dem" oninput="runSim()">
           </div>
-          <div class="control-item">
-            <label>Supplier Delay <span class="control-val" id="val-delay">0 days</span></label>
-            <input type="range" min="0" max="21" value="0" id="ctrl-delay" oninput="updateScenario()">
+          <div class="ctrl-item">
+            <label>Supplier Delay <span class="ctrl-val" id="v-del">0 days</span></label>
+            <input type="range" min="0" max="21" value="0" id="c-del" oninput="runSim()">
           </div>
-          <div class="control-item">
-            <label>Labor Availability <span class="control-val" id="val-labor">100%</span></label>
-            <input type="range" min="40" max="100" value="100" id="ctrl-labor" oninput="updateScenario()">
+          <div class="ctrl-item">
+            <label>Labor Availability <span class="ctrl-val" id="v-lab">100%</span></label>
+            <input type="range" min="40" max="100" value="100" id="c-lab" oninput="runSim()">
           </div>
-          <div class="control-item">
-            <label>Reorder Policy <span class="control-val" id="val-reorder">Standard</span></label>
-            <input type="range" min="1" max="3" value="2" id="ctrl-reorder" oninput="updateScenario()">
+          <div class="ctrl-item">
+            <label>Reorder Policy <span class="ctrl-val" id="v-reo">Standard</span></label>
+            <input type="range" min="1" max="3" value="2" id="c-reo" oninput="runSim()">
           </div>
         </div>
       </div>
-
-      <!-- Charts -->
-      <div class="twin-charts">
-        <div class="chart-container">
-          <div class="chart-title">Inventory Levels (30-Day)</div>
-          <div class="chart-canvas-wrap"><canvas id="inventoryChart"></canvas></div>
+      <div class="tw-charts">
+        <div class="chart-box">
+          <div class="chart-title">Inventory Levels &mdash; 30 Day</div>
+          <div class="chart-wrap"><canvas id="invChart"></canvas></div>
         </div>
-        <div class="chart-container">
+        <div class="chart-box">
           <div class="chart-title">Daily Throughput</div>
-          <div class="chart-canvas-wrap"><canvas id="throughputChart"></canvas></div>
+          <div class="chart-wrap"><canvas id="tpChart"></canvas></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ====== DATA CONNECTORS ====== -->
-<section class="connectors" id="connectors">
-  <div class="container">
-    <div class="reveal">
-      <div class="section-label">// Connectors</div>
-      <div class="section-title">Bring your own data.</div>
-    </div>
-    <div class="connectors-grid reveal">
-      <div class="connector-cards">
-        <div class="connector-card">
-          <div class="connector-icon">&#128462;</div>
-          <div class="connector-name">Excel / CSV</div>
-          <div class="connector-desc">Upload inventory, orders, and supplier data from spreadsheets.</div>
-          <div class="connector-status status-ready">Ready</div>
-        </div>
-        <div class="connector-card">
-          <div class="connector-icon">&#9881;</div>
-          <div class="connector-name">ERP Systems</div>
-          <div class="connector-desc">SAP, Oracle NetSuite, Microsoft Dynamics connectors.</div>
-          <div class="connector-status status-ready">Ready</div>
-        </div>
-        <div class="connector-card">
-          <div class="connector-icon">&#128190;</div>
-          <div class="connector-name">REST API</div>
-          <div class="connector-desc">Push real-time data from any system via JSON endpoints.</div>
-          <div class="connector-status status-ready">Ready</div>
-        </div>
-        <div class="connector-card">
-          <div class="connector-icon">&#128736;</div>
-          <div class="connector-name">CAD / BOM</div>
-          <div class="connector-desc">Import bill of materials and facility layouts for twin modeling.</div>
-          <div class="connector-status status-coming">Coming Soon</div>
+<!-- ═══ FEATURES ═══ -->
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="feat-row sr">
+      <div class="feat-text">
+        <div class="t-label">// Architecture</div>
+        <h2 class="t-h2">Data-first.<br>Replace mock JSON with<br>your real operations.</h2>
+        <p class="t-body">The simulation engine is decoupled from the UI. Swap the data layer — the twin rebuilds itself. No redesign, no re-engineering.</p>
+        <div class="feat-list">
+          <div class="feat-list-item"><div class="feat-check">&#10003;</div><div><strong>Schema mapping</strong> — auto-detect columns, map to Nexus entities, validate before import</div></div>
+          <div class="feat-list-item"><div class="feat-check">&#10003;</div><div><strong>Incremental sync</strong> — push deltas via API or schedule full refreshes</div></div>
+          <div class="feat-list-item"><div class="feat-check">&#10003;</div><div><strong>Data sandbox</strong> — test new data against the existing twin before going live</div></div>
         </div>
       </div>
-      <div class="connectors-info">
-        <h3>Plug-and-play<br>architecture.</h3>
-        <p>Nexus separates your raw data from the twin model. Upload once, map your schema, and the simulation engine handles the rest. No engineering team required.</p>
-        <div class="connector-feature">
-          <div class="connector-feature-icon">&#10003;</div>
-          <div class="connector-feature-text"><strong>Schema mapping</strong> — auto-detect columns, map to Nexus entities (SKU, supplier, warehouse), and validate before import.</div>
-        </div>
-        <div class="connector-feature">
-          <div class="connector-feature-icon">&#10003;</div>
-          <div class="connector-feature-text"><strong>Incremental sync</strong> — push deltas via API or schedule full refreshes. The twin stays current without manual re-uploads.</div>
-        </div>
-        <div class="connector-feature">
-          <div class="connector-feature-icon">&#10003;</div>
-          <div class="connector-feature-text"><strong>Data sandbox</strong> — test new data against the existing twin before promoting to production. No risk to live dashboards.</div>
-        </div>
-
-        <div class="code-block">
-<pre><span class="code-comment">// Example: Upload inventory data</span>
-<span class="code-key">POST</span> /api/v1/data/inventory
-<span class="code-bracket">{</span>
-  <span class="code-key">"source"</span>: <span class="code-string">"erp_export.xlsx"</span>,
-  <span class="code-key">"mapping"</span>: <span class="code-bracket">{</span>
-    <span class="code-key">"sku_col"</span>: <span class="code-string">"Item Code"</span>,
-    <span class="code-key">"qty_col"</span>: <span class="code-string">"On Hand"</span>,
-    <span class="code-key">"warehouse_col"</span>: <span class="code-string">"Location"</span>
-  <span class="code-bracket">}</span>
-<span class="code-bracket">}</span></pre>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ====== CTA ====== -->
-<section class="cta-section" id="cta">
-  <div class="container reveal">
-    <div class="section-label">// Get Started</div>
-    <div class="section-title">Ready to mirror<br>your operations?</div>
-    <div class="section-desc">Nexus Twin is built for SMBs who move fast. Connect your data, build your twin, and start simulating — in days, not months.</div>
-    <div class="hero-actions" style="margin-top:2rem;">
-      <button class="btn-primary">Request Early Access</button>
-      <button class="btn-secondary">View Documentation</button>
-    </div>
-  </div>
-</section>
-
-<!-- ====== FOOTER ====== -->
-<footer class="footer">
-  <p>Nexus Twin &mdash; Digital Twin Platform for Supply Chain Operations</p>
-</footer>
-
-<!-- ====== JAVASCRIPT ====== -->
-<script>
-// ========== MOCK DATA (REPLACE WITH REAL DATA) ==========
-const DATA = {
-  suppliers: [
-    { id: 's1', name: 'Shenzhen Components', location: 'Shenzhen, CN', leadTime: 14, reliability: 0.92, volume: 520, category: 'Electronics' },
-    { id: 's2', name: 'Gujarat Textiles', location: 'Ahmedabad, IN', leadTime: 18, reliability: 0.88, volume: 340, category: 'Textiles' },
-    { id: 's3', name: 'Rhine Chemicals', location: 'Frankfurt, DE', leadTime: 10, reliability: 0.95, volume: 280, category: 'Raw Materials' },
-    { id: 's4', name: 'Midwest Steel Co', location: 'Chicago, US', leadTime: 5, reliability: 0.97, volume: 410, category: 'Metals' },
-    { id: 's5', name: 'Osaka Precision', location: 'Osaka, JP', leadTime: 12, reliability: 0.93, volume: 190, category: 'Components' },
-    { id: 's6', name: 'Lagos Packaging', location: 'Lagos, NG', leadTime: 21, reliability: 0.84, volume: 260, category: 'Packaging' },
+      <div class="feat-visual">
+        <div class="fv-code">
+<span class="cc">// Replace this object with your ERP export</span>
+<span class="ck">const</span> DATA = {
+  <span class="ck">suppliers</span>: [
+    { <span class="ck">id</span>: <span class="cs">'s1'</span>,
+      <span class="ck">name</span>: <span class="cs">'Your Supplier'</span>,
+      <span class="ck">leadTime</span>: 14,
+      <span class="ck">reliability</span>: 0.92 }
   ],
-  warehouses: [
-    { id: 'w1', name: 'Dallas DC', location: 'Dallas, TX', capacity: 50000, utilization: 0.73, laborAvail: 0.92, throughput: 820, skuCount: 16 },
-    { id: 'w2', name: 'Newark Hub', location: 'Newark, NJ', capacity: 35000, utilization: 0.68, laborAvail: 0.88, throughput: 464, skuCount: 12 },
-  ],
-  customers: [
-    { id: 'c1', name: 'Northeast', demandUnits: 380, fillRate: 0.97, region: 'NY/NJ/CT' },
-    { id: 'c2', name: 'Southeast', demandUnits: 290, fillRate: 0.95, region: 'FL/GA/NC' },
-    { id: 'c3', name: 'Midwest', demandUnits: 310, fillRate: 0.96, region: 'IL/OH/MI' },
-    { id: 'c4', name: 'West Coast', demandUnits: 420, fillRate: 0.94, region: 'CA/WA/OR' },
-    { id: 'c5', name: 'South Central', demandUnits: 200, fillRate: 0.98, region: 'TX/OK/LA' },
-  ],
-  connections: [
-    { from: 's1', to: 'w1' }, { from: 's2', to: 'w1' }, { from: 's3', to: 'w2' },
-    { from: 's4', to: 'w1' }, { from: 's4', to: 'w2' }, { from: 's5', to: 'w2' },
-    { from: 's6', to: 'w1' },
-    { from: 'w1', to: 'c3' }, { from: 'w1', to: 'c5' }, { from: 'w1', to: 'c2' },
-    { from: 'w2', to: 'c1' }, { from: 'w2', to: 'c4' }, { from: 'w2', to: 'c2' },
-  ],
-  skus: [
-    { id: 'SKU-001', name: 'Widget A', stock: 2400, reorderPt: 500, dailyDemand: 85, unitCost: 12.50 },
-    { id: 'SKU-002', name: 'Sensor Pack B', stock: 1800, reorderPt: 400, dailyDemand: 62, unitCost: 28.00 },
-    { id: 'SKU-003', name: 'Frame Assembly', stock: 950, reorderPt: 200, dailyDemand: 34, unitCost: 45.00 },
-    { id: 'SKU-004', name: 'Cable Harness C', stock: 3200, reorderPt: 800, dailyDemand: 110, unitCost: 8.75 },
-    { id: 'SKU-005', name: 'PCB Module D', stock: 600, reorderPt: 150, dailyDemand: 25, unitCost: 52.00 },
-    { id: 'SKU-006', name: 'Packaging Kit', stock: 5400, reorderPt: 1200, dailyDemand: 180, unitCost: 3.20 },
-    { id: 'SKU-007', name: 'Motor Unit E', stock: 420, reorderPt: 100, dailyDemand: 18, unitCost: 89.00 },
-    { id: 'SKU-008', name: 'Rubber Seal F', stock: 8200, reorderPt: 2000, dailyDemand: 250, unitCost: 1.50 },
-    { id: 'SKU-009', name: 'Display Panel G', stock: 310, reorderPt: 80, dailyDemand: 12, unitCost: 120.00 },
-    { id: 'SKU-010', name: 'Fastener Set H', stock: 12000, reorderPt: 3000, dailyDemand: 400, unitCost: 0.85 },
-    { id: 'SKU-011', name: 'Thermal Paste J', stock: 1600, reorderPt: 300, dailyDemand: 55, unitCost: 6.40 },
-    { id: 'SKU-012', name: 'Alloy Bracket K', stock: 780, reorderPt: 200, dailyDemand: 30, unitCost: 18.50 },
-    { id: 'SKU-013', name: 'LED Strip L', stock: 2100, reorderPt: 500, dailyDemand: 70, unitCost: 4.20 },
-    { id: 'SKU-014', name: 'Gear Assembly M', stock: 540, reorderPt: 120, dailyDemand: 22, unitCost: 67.00 },
-    { id: 'SKU-015', name: 'Filter Unit N', stock: 1350, reorderPt: 300, dailyDemand: 48, unitCost: 14.00 },
-    { id: 'SKU-016', name: 'Power Supply P', stock: 890, reorderPt: 200, dailyDemand: 35, unitCost: 42.00 },
-  ]
+  <span class="ck">warehouses</span>: [...],
+  <span class="ck">customers</span>: [...],
+  <span class="ck">skus</span>: [...]
 };
 
-// ========== SIMULATION ENGINE ==========
-class SimulationEngine {
-  constructor(data) {
-    this.baseData = JSON.parse(JSON.stringify(data));
-    this.data = JSON.parse(JSON.stringify(data));
-    this.params = { demand: 100, delay: 0, labor: 100, reorder: 2 };
-  }
+<span class="cc">// That's it. The twin rebuilds.</span>
+        </div>
+      </div>
+    </div>
 
-  setParams(params) {
-    this.params = { ...params };
-    this.simulate();
-  }
-
-  simulate() {
-    const d = this.params;
-    const demandFactor = d.demand / 100;
-    const laborFactor = d.labor / 100;
-    const delayDays = d.delay;
-    const reorderMult = d.reorder === 1 ? 0.7 : d.reorder === 2 ? 1.0 : 1.4;
-
-    // Recalculate warehouse metrics
-    this.data.warehouses.forEach((w, i) => {
-      const base = this.baseData.warehouses[i];
-      w.utilization = Math.min(0.98, base.utilization * demandFactor);
-      w.throughput = Math.round(base.throughput * laborFactor * Math.min(1, 1 - (delayDays / 40)));
-      w.laborAvail = laborFactor * base.laborAvail;
-    });
-
-    // Recalculate customer fill rates
-    this.data.customers.forEach((c, i) => {
-      const base = this.baseData.customers[i];
-      let fillImpact = 1;
-      if (delayDays > 7) fillImpact -= (delayDays - 7) * 0.015;
-      if (demandFactor > 1.3) fillImpact -= (demandFactor - 1.3) * 0.15;
-      if (laborFactor < 0.7) fillImpact -= (0.7 - laborFactor) * 0.2;
-      c.fillRate = Math.max(0.6, Math.min(1, base.fillRate * fillImpact));
-      c.demandUnits = Math.round(base.demandUnits * demandFactor);
-    });
-
-    // Recalculate supplier metrics
-    this.data.suppliers.forEach((s, i) => {
-      const base = this.baseData.suppliers[i];
-      s.leadTime = base.leadTime + delayDays;
-      s.reliability = Math.max(0.5, base.reliability - (delayDays * 0.01));
-    });
-
-    // Recalculate SKUs
-    this.data.skus.forEach((s, i) => {
-      const base = this.baseData.skus[i];
-      s.dailyDemand = Math.round(base.dailyDemand * demandFactor);
-      s.reorderPt = Math.round(base.reorderPt * reorderMult);
-      s.stock = Math.max(0, Math.round(base.stock - (delayDays * base.dailyDemand * 0.3 * demandFactor)));
-    });
-  }
-
-  getSystemKPIs() {
-    const d = this.data;
-    const totalDemand = d.customers.reduce((a, c) => a + c.demandUnits, 0);
-    const avgFillRate = d.customers.reduce((a, c) => a + c.fillRate, 0) / d.customers.length;
-    const totalThroughput = d.warehouses.reduce((a, w) => a + w.throughput, 0);
-    const totalStock = d.skus.reduce((a, s) => a + s.stock, 0);
-    const avgCost = d.skus.reduce((a, s) => a + (s.stock * s.unitCost), 0);
-    const stockoutSKUs = d.skus.filter(s => s.stock <= s.reorderPt * 0.3).length;
-    const avgLeadTime = d.suppliers.reduce((a, s) => a + s.leadTime, 0) / d.suppliers.length;
-    const avgOnTime = d.suppliers.reduce((a, s) => a + s.reliability, 0) / d.suppliers.length;
-    const avgUtil = d.warehouses.reduce((a, w) => a + w.utilization, 0) / d.warehouses.length;
-
-    return {
-      fillRate: (avgFillRate * 100).toFixed(1) + '%',
-      throughput: totalThroughput.toLocaleString(),
-      carryingCost: '$' + (avgCost / 1000).toFixed(1) + 'K',
-      stockoutRisk: ((stockoutSKUs / d.skus.length) * 100).toFixed(1) + '%',
-      leadTime: avgLeadTime.toFixed(1) + 'd',
-      onTime: (avgOnTime * 100).toFixed(1) + '%',
-      activeSKUs: d.skus.length,
-      utilRate: (avgUtil * 100).toFixed(0) + '%',
-    };
-  }
-
-  getInventoryData() {
-    const days = 30;
-    const labels = [];
-    const datasets = [];
-    const skusSample = this.data.skus.slice(0, 4);
-
-    for (let i = 0; i < days; i++) labels.push('D' + (i + 1));
-
-    const colors = ['#e04a2f', '#3b82f6', '#22c55e', '#eab308'];
-    skusSample.forEach((sku, idx) => {
-      const pts = [];
-      let stock = sku.stock;
-      for (let i = 0; i < days; i++) {
-        const variance = (Math.random() - 0.5) * sku.dailyDemand * 0.4;
-        stock = Math.max(0, stock - sku.dailyDemand + variance);
-        if (stock <= sku.reorderPt) stock += sku.reorderPt * 1.5;
-        pts.push(Math.round(stock));
-      }
-      datasets.push({
-        label: sku.name,
-        data: pts,
-        borderColor: colors[idx],
-        backgroundColor: colors[idx] + '15',
-        borderWidth: 1.5,
-        tension: 0.35,
-        fill: false,
-        pointRadius: 0,
-      });
-    });
-
-    return { labels, datasets };
-  }
-
-  getThroughputData() {
-    const days = 30;
-    const labels = [];
-    const data1 = [], data2 = [];
-    for (let i = 0; i < days; i++) {
-      labels.push('D' + (i + 1));
-      const base1 = this.data.warehouses[0].throughput;
-      const base2 = this.data.warehouses[1].throughput;
-      data1.push(Math.round(base1 + (Math.random() - 0.5) * base1 * 0.2));
-      data2.push(Math.round(base2 + (Math.random() - 0.5) * base2 * 0.2));
-    }
-    return {
-      labels,
-      datasets: [
-        { label: 'Dallas DC', data: data1, backgroundColor: '#e04a2f88', borderColor: '#e04a2f', borderWidth: 1, borderRadius: 2 },
-        { label: 'Newark Hub', data: data2, backgroundColor: '#3b82f688', borderColor: '#3b82f6', borderWidth: 1, borderRadius: 2 },
-      ]
-    };
-  }
-}
-
-const engine = new SimulationEngine(DATA);
-engine.simulate();
-
-// ========== HERO CANVAS ANIMATION ==========
-(function initHeroCanvas() {
-  const canvas = document.getElementById('heroCanvas');
-  const ctx = canvas.getContext('2d');
-  let particles = [];
-  let w, h;
-
-  function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  for (let i = 0; i < 80; i++) {
-    particles.push({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      r: Math.random() * 1.5 + 0.5,
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, w, h);
-    particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0) p.x = w;
-      if (p.x > w) p.x = 0;
-      if (p.y < 0) p.y = h;
-      if (p.y > h) p.y = 0;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(224, 74, 47, 0.35)';
-      ctx.fill();
-    });
-
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 150) {
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(224, 74, 47, ${0.08 * (1 - dist / 150)})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
-        }
-      }
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
-// ========== NETWORK VISUALIZATION ==========
-(function initNetwork() {
-  const svg = document.getElementById('networkSvg');
-  const allNodes = [];
-  const nodePositions = {};
-
-  // Position nodes
-  const supplierY = [60, 140, 220, 300, 380, 455];
-  DATA.suppliers.forEach((s, i) => {
-    nodePositions[s.id] = { x: 90, y: supplierY[i], type: 'supplier', data: s };
-    allNodes.push({ ...s, type: 'supplier', x: 90, y: supplierY[i] });
-  });
-
-  const whY = [180, 340];
-  DATA.warehouses.forEach((w, i) => {
-    nodePositions[w.id] = { x: 350, y: whY[i], type: 'warehouse', data: w };
-    allNodes.push({ ...w, type: 'warehouse', x: 350, y: whY[i] });
-  });
-
-  const custY = [80, 170, 260, 350, 435];
-  DATA.customers.forEach((c, i) => {
-    nodePositions[c.id] = { x: 610, y: custY[i], type: 'customer', data: c };
-    allNodes.push({ ...c, type: 'customer', x: 610, y: custY[i] });
-  });
-
-  // Draw edges
-  DATA.connections.forEach(conn => {
-    const from = nodePositions[conn.from];
-    const to = nodePositions[conn.to];
-    const midX = (from.x + to.x) / 2;
-
-    // Background line
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', `M${from.x},${from.y} C${midX},${from.y} ${midX},${to.y} ${to.x},${to.y}`);
-    path.setAttribute('class', 'edge-line');
-    svg.appendChild(path);
-
-    // Animated flow
-    const flow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    flow.setAttribute('d', `M${from.x},${from.y} C${midX},${from.y} ${midX},${to.y} ${to.x},${to.y}`);
-    flow.setAttribute('class', 'edge-flow');
-    svg.appendChild(flow);
-  });
-
-  // Column labels
-  const colLabels = [
-    { x: 90, y: 25, text: 'SUPPLIERS' },
-    { x: 350, y: 25, text: 'WAREHOUSES' },
-    { x: 610, y: 25, text: 'CUSTOMERS' },
-  ];
-  colLabels.forEach(l => {
-    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    t.setAttribute('x', l.x);
-    t.setAttribute('y', l.y);
-    t.setAttribute('class', 'node-type-label');
-    t.textContent = l.text;
-    svg.appendChild(t);
-  });
-
-  // Draw nodes
-  const nodeColors = { supplier: '#e04a2f', warehouse: '#3b82f6', customer: '#22c55e' };
-  allNodes.forEach(node => {
-    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.setAttribute('class', 'node-group');
-    g.setAttribute('data-id', node.id);
-
-    const r = node.type === 'warehouse' ? 20 : 14;
-    // Hover ring
-    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    ring.setAttribute('cx', node.x);
-    ring.setAttribute('cy', node.y);
-    ring.setAttribute('r', r + 6);
-    ring.setAttribute('fill', 'none');
-    ring.setAttribute('stroke', nodeColors[node.type]);
-    ring.setAttribute('stroke-width', '1.5');
-    ring.setAttribute('opacity', '0.3');
-    ring.setAttribute('class', 'node-ring');
-    g.appendChild(ring);
-
-    // Main circle
-    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    c.setAttribute('cx', node.x);
-    c.setAttribute('cy', node.y);
-    c.setAttribute('r', r);
-    c.setAttribute('fill', nodeColors[node.type] + '25');
-    c.setAttribute('stroke', nodeColors[node.type]);
-    c.setAttribute('stroke-width', '2');
-    c.setAttribute('class', 'node-circle');
-    g.appendChild(c);
-
-    // Inner dot
-    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    dot.setAttribute('cx', node.x);
-    dot.setAttribute('cy', node.y);
-    dot.setAttribute('r', 3);
-    dot.setAttribute('fill', nodeColors[node.type]);
-    g.appendChild(dot);
-
-    // Label
-    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    label.setAttribute('x', node.x);
-    label.setAttribute('y', node.y + r + 16);
-    label.setAttribute('class', 'node-label');
-    label.textContent = node.name;
-    g.appendChild(label);
-
-    g.addEventListener('click', () => showNodeDetail(node));
-    svg.appendChild(g);
-  });
-})();
-
-function showNodeDetail(node) {
-  const detail = document.getElementById('nodeDetail');
-  detail.style.display = 'block';
-  document.getElementById('nodeDetailName').textContent = node.name;
-  document.getElementById('nodeDetailType').textContent = node.type.toUpperCase();
-
-  const stats = document.getElementById('nodeDetailStats');
-  let html = '';
-
-  if (node.type === 'supplier') {
-    const s = engine.data.suppliers.find(x => x.id === node.id);
-    html = `
-      <div><div class="node-stat-label">Lead Time</div><div class="node-stat-value">${s.leadTime}d</div></div>
-      <div><div class="node-stat-label">Reliability</div><div class="node-stat-value">${(s.reliability*100).toFixed(0)}%</div></div>
-      <div><div class="node-stat-label">Volume</div><div class="node-stat-value">${s.volume}/mo</div></div>
-      <div><div class="node-stat-label">Category</div><div class="node-stat-value">${s.category}</div></div>
-    `;
-  } else if (node.type === 'warehouse') {
-    const w = engine.data.warehouses.find(x => x.id === node.id);
-    html = `
-      <div><div class="node-stat-label">Utilization</div><div class="node-stat-value">${(w.utilization*100).toFixed(0)}%</div></div>
-      <div><div class="node-stat-label">Throughput</div><div class="node-stat-value">${w.throughput}/d</div></div>
-      <div><div class="node-stat-label">Capacity</div><div class="node-stat-value">${(w.capacity/1000).toFixed(0)}K</div></div>
-      <div><div class="node-stat-label">Labor</div><div class="node-stat-value">${(w.laborAvail*100).toFixed(0)}%</div></div>
-    `;
-  } else {
-    const c = engine.data.customers.find(x => x.id === node.id);
-    html = `
-      <div><div class="node-stat-label">Fill Rate</div><div class="node-stat-value">${(c.fillRate*100).toFixed(1)}%</div></div>
-      <div><div class="node-stat-label">Demand</div><div class="node-stat-value">${c.demandUnits}/d</div></div>
-      <div><div class="node-stat-label">Region</div><div class="node-stat-value">${c.region}</div></div>
-      <div><div class="node-stat-label">Status</div><div class="node-stat-value" style="color:${c.fillRate>0.93?'#22c55e':'#eab308'}">${c.fillRate>0.93?'Healthy':'At Risk'}</div></div>
-    `;
-  }
-  stats.innerHTML = html;
-}
-
-// ========== SCENARIO CONTROLS ==========
-function updateScenario() {
-  const demand = +document.getElementById('ctrl-demand').value;
-  const delay = +document.getElementById('ctrl-delay').value;
-  const labor = +document.getElementById('ctrl-labor').value;
-  const reorder = +document.getElementById('ctrl-reorder').value;
-
-  document.getElementById('val-demand').textContent = demand + '%';
-  document.getElementById('val-delay').textContent = delay + ' days';
-  document.getElementById('val-labor').textContent = labor + '%';
-  const reorderLabels = { 1: 'Conservative', 2: 'Standard', 3: 'Aggressive' };
-  document.getElementById('val-reorder').textContent = reorderLabels[reorder];
-
-  engine.setParams({ demand, delay, labor, reorder });
-  updateKPIs();
-  updateCharts();
-}
-
-function updateKPIs() {
-  const kpis = engine.getSystemKPIs();
-  document.getElementById('kpi-fillRate').textContent = kpis.fillRate;
-  document.getElementById('kpi-throughput').textContent = kpis.throughput;
-  document.getElementById('kpi-carryingCost').textContent = kpis.carryingCost;
-  document.getElementById('kpi-stockoutRisk').textContent = kpis.stockoutRisk;
-  document.getElementById('kpi-leadTime').textContent = kpis.leadTime;
-  document.getElementById('kpi-onTime').textContent = kpis.onTime;
-  document.getElementById('kpi-activeSKUs').textContent = kpis.activeSKUs;
-  document.getElementById('kpi-utilRate').textContent = kpis.utilRate;
-}
-
-// ========== CHARTS ==========
-const chartDefaults = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      labels: { color: '#8892a6', font: { family: 'Inter', size: 10 }, boxWidth: 8, padding: 12 }
-    }
-  },
-  scales: {
-    x: {
-      grid: { color: '#1e2738', drawBorder: false },
-      ticks: { color: '#5a6478', font: { family: 'JetBrains Mono', size: 9 }, maxTicksLimit: 10 }
-    },
-    y: {
-      grid: { color: '#1e2738', drawBorder: false },
-      ticks: { color: '#5a6478', font: { family: 'JetBrains Mono', size: 9 } }
-    }
-  }
-};
-
-let inventoryChart, throughputChart;
-
-function initCharts() {
-  const invData = engine.getInventoryData();
-  inventoryChart = new Chart(document.getElementById('inventoryChart'), {
-    type: 'line',
-    data: invData,
-    options: { ...chartDefaults }
-  });
-
-  const tpData = engine.getThroughputData();
-  throughputChart = new Chart(document.getElementById('throughputChart'), {
-    type: 'bar',
-    data: tpData,
-    options: {
-      ...chartDefaults,
-      scales: {
-        ...chartDefaults.scales,
-        x: { ...chartDefaults.scales.x, stacked: true },
-        y: { ...chartDefaults.scales.y, stacked: true }
-      }
-    }
-  });
-}
-
-function updateCharts() {
-  if (inventoryChart) {
-    const invData = engine.getInventoryData();
-    inventoryChart.data = invData;
-    inventoryChart.update('none');
-  }
-  if (throughputChart) {
-    const tpData = engine.getThroughputData();
-    throughputChart.data = tpData;
-    throughputChart.update('none');
-  }
-}
-
-// ========== SCROLL ANIMATIONS ==========
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-// Nav scroll
-window.addEventListener('scroll', () => {
-  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
+    <div class="feat-row reverse sr">
+      <div class="feat-text">
+        <div class="t-label">// Simulation Engine</div>
+        <h2 class="t-h2">Model chaos<br>before it arrives.</h2>
+        <p class="t-body">Adjust four parameters — demand volume, supplier delay, labor availability, and reorder policy — and watch every KPI recalculate downstream in real time.</p>
+        <div class="feat-list">
+          <div class="feat-list-item"><div class="feat-check">&#10003;</div><div><strong>Fill rate impact</strong> — see exactly which customer regions degrade first</div></div>
+          <div class="feat-list-item"><div class="feat-check">&#10003;</div><div><strong>Cost modeling</strong> — carrying cost shifts dynamically with inventory levels</div></div>
+          <div class="feat-list-item"><div class="feat-check">&#10003;</div><div><strong>Stockout prediction</strong> — identify at-risk SKUs before they hit zero</div></div>
+        </div>
+      </div>
+      <div class="feat-visual">
+        <div class="fv-code">
+<span class="cc">// Scenario: Port congestion + peak season</span>
+engine.<span class="ck">setParams</span>({
+  <span class="ck">demand</span>: 160,    <span class="cc">// +60% holiday spike</span>
+  <span class="ck">delay</span>: 14,      <span class="cc">// 2-week port backup</span>
+  <span class="ck">labor</span>: 75,      <span class="cc">// seasonal staffing</span>
+  <span class="ck">reorder</span>: 3      <span class="cc">// aggressive restocking</span>
 });
 
-// Init
-updateKPIs();
-initCharts();
+<span class="cc">// Result: fill rate drops to 82.4%</span>
+<span class="cc">// 5 SKUs enter stockout risk zone</span>
+<span class="cc">// carrying cost spikes +41%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONNECTORS ═══ -->
+<section class="connectors" id="connectors">
+  <div class="wrap">
+    <div class="conn-head sr">
+      <div class="t-label">// Connectors</div>
+      <h2 class="t-h1">Bring your own data.</h2>
+      <p class="t-body">Upload once, map your schema, and the simulation engine handles the rest. No engineering team required.</p>
+    </div>
+    <div class="conn-grid sr-s">
+      <div class="conn-card">
+        <div class="conn-ico">&#128462;</div>
+        <h4>Excel / CSV</h4>
+        <p>Upload inventory, orders, and supplier data from spreadsheets.</p>
+        <span class="conn-badge cb-ready">Ready</span>
+      </div>
+      <div class="conn-card">
+        <div class="conn-ico">&#9881;</div>
+        <h4>ERP Systems</h4>
+        <p>SAP, Oracle NetSuite, Microsoft Dynamics connectors.</p>
+        <span class="conn-badge cb-ready">Ready</span>
+      </div>
+      <div class="conn-card">
+        <div class="conn-ico">&#128190;</div>
+        <h4>REST API</h4>
+        <p>Push real-time data from any system via JSON endpoints.</p>
+        <span class="conn-badge cb-ready">Ready</span>
+      </div>
+      <div class="conn-card">
+        <div class="conn-ico">&#128736;</div>
+        <h4>CAD / BOM</h4>
+        <p>Import bill of materials and facility layouts for twin modeling.</p>
+        <span class="conn-badge cb-soon">Coming Soon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="cta" id="cta">
+  <div class="wrap">
+    <div class="cta-inner sr">
+      <div class="t-label">// Get Started</div>
+      <h2 class="t-h1">Ready to mirror<br>your operations?</h2>
+      <p class="t-body">Connect your data, build your twin, and start simulating — in days, not months.</p>
+      <div class="hero-btns" style="opacity:1">
+        <a class="btn-fill" href="#">Request Early Access</a>
+        <a class="btn-ghost" href="#">View Documentation</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="nav-left" style="margin-bottom:1.2rem">
+          <div class="nav-mark">N</div>
+          <span class="nav-wordmark">Nexus Twin</span>
+        </div>
+        <p>Digital twin platform for supply chain operations. Built for SMBs who move fast.</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <a href="#overview">Overview</a>
+        <a href="#twin">Digital Twin</a>
+        <a href="#features">Architecture</a>
+        <a href="#connectors">Connectors</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Resources</div>
+        <a href="#">Documentation</a>
+        <a href="#">API Reference</a>
+        <a href="#">Data Schema</a>
+        <a href="#">Changelog</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Company</div>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; 2026 Nexus Twin. All rights reserved.</span>
+      <span class="footer-copy">Digital Twin Platform for Supply Chain Operations</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════════ -->
+<script>
+// ═══ DATA (SWAP WITH REAL DATA) ═══
+const DATA={suppliers:[{id:'s1',name:'Shenzhen Components',location:'Shenzhen, CN',leadTime:14,reliability:.92,volume:520,category:'Electronics'},{id:'s2',name:'Gujarat Textiles',location:'Ahmedabad, IN',leadTime:18,reliability:.88,volume:340,category:'Textiles'},{id:'s3',name:'Rhine Chemicals',location:'Frankfurt, DE',leadTime:10,reliability:.95,volume:280,category:'Raw Materials'},{id:'s4',name:'Midwest Steel Co',location:'Chicago, US',leadTime:5,reliability:.97,volume:410,category:'Metals'},{id:'s5',name:'Osaka Precision',location:'Osaka, JP',leadTime:12,reliability:.93,volume:190,category:'Components'},{id:'s6',name:'Lagos Packaging',location:'Lagos, NG',leadTime:21,reliability:.84,volume:260,category:'Packaging'}],warehouses:[{id:'w1',name:'Dallas DC',location:'Dallas, TX',capacity:50000,utilization:.73,laborAvail:.92,throughput:820,skuCount:16},{id:'w2',name:'Newark Hub',location:'Newark, NJ',capacity:35000,utilization:.68,laborAvail:.88,throughput:464,skuCount:12}],customers:[{id:'c1',name:'Northeast',demandUnits:380,fillRate:.97,region:'NY/NJ/CT'},{id:'c2',name:'Southeast',demandUnits:290,fillRate:.95,region:'FL/GA/NC'},{id:'c3',name:'Midwest',demandUnits:310,fillRate:.96,region:'IL/OH/MI'},{id:'c4',name:'West Coast',demandUnits:420,fillRate:.94,region:'CA/WA/OR'},{id:'c5',name:'South Central',demandUnits:200,fillRate:.98,region:'TX/OK/LA'}],connections:[{from:'s1',to:'w1'},{from:'s2',to:'w1'},{from:'s3',to:'w2'},{from:'s4',to:'w1'},{from:'s4',to:'w2'},{from:'s5',to:'w2'},{from:'s6',to:'w1'},{from:'w1',to:'c3'},{from:'w1',to:'c5'},{from:'w1',to:'c2'},{from:'w2',to:'c1'},{from:'w2',to:'c4'},{from:'w2',to:'c2'}],skus:[{id:'SKU-001',name:'Widget A',stock:2400,reorderPt:500,dailyDemand:85,unitCost:12.5},{id:'SKU-002',name:'Sensor Pack B',stock:1800,reorderPt:400,dailyDemand:62,unitCost:28},{id:'SKU-003',name:'Frame Assembly',stock:950,reorderPt:200,dailyDemand:34,unitCost:45},{id:'SKU-004',name:'Cable Harness C',stock:3200,reorderPt:800,dailyDemand:110,unitCost:8.75},{id:'SKU-005',name:'PCB Module D',stock:600,reorderPt:150,dailyDemand:25,unitCost:52},{id:'SKU-006',name:'Packaging Kit',stock:5400,reorderPt:1200,dailyDemand:180,unitCost:3.2},{id:'SKU-007',name:'Motor Unit E',stock:420,reorderPt:100,dailyDemand:18,unitCost:89},{id:'SKU-008',name:'Rubber Seal F',stock:8200,reorderPt:2000,dailyDemand:250,unitCost:1.5},{id:'SKU-009',name:'Display Panel G',stock:310,reorderPt:80,dailyDemand:12,unitCost:120},{id:'SKU-010',name:'Fastener Set H',stock:12000,reorderPt:3000,dailyDemand:400,unitCost:.85},{id:'SKU-011',name:'Thermal Paste J',stock:1600,reorderPt:300,dailyDemand:55,unitCost:6.4},{id:'SKU-012',name:'Alloy Bracket K',stock:780,reorderPt:200,dailyDemand:30,unitCost:18.5},{id:'SKU-013',name:'LED Strip L',stock:2100,reorderPt:500,dailyDemand:70,unitCost:4.2},{id:'SKU-014',name:'Gear Assembly M',stock:540,reorderPt:120,dailyDemand:22,unitCost:67},{id:'SKU-015',name:'Filter Unit N',stock:1350,reorderPt:300,dailyDemand:48,unitCost:14},{id:'SKU-016',name:'Power Supply P',stock:890,reorderPt:200,dailyDemand:35,unitCost:42}]};
+
+// ═══ SIMULATION ENGINE ═══
+class SimEngine{constructor(d){this.base=JSON.parse(JSON.stringify(d));this.data=JSON.parse(JSON.stringify(d));this.p={demand:100,delay:0,labor:100,reorder:2}}set(p){this.p={...p};this.run()}run(){const f=this.p.demand/100,l=this.p.labor/100,d=this.p.delay,r=this.p.reorder===1?.7:this.p.reorder===2?1:1.4;this.data.warehouses.forEach((w,i)=>{const b=this.base.warehouses[i];w.utilization=Math.min(.98,b.utilization*f);w.throughput=Math.round(b.throughput*l*Math.min(1,1-d/40));w.laborAvail=l*b.laborAvail});this.data.customers.forEach((c,i)=>{const b=this.base.customers[i];let fi=1;if(d>7)fi-=(d-7)*.015;if(f>1.3)fi-=(f-1.3)*.15;if(l<.7)fi-=(.7-l)*.2;c.fillRate=Math.max(.6,Math.min(1,b.fillRate*fi));c.demandUnits=Math.round(b.demandUnits*f)});this.data.suppliers.forEach((s,i)=>{const b=this.base.suppliers[i];s.leadTime=b.leadTime+d;s.reliability=Math.max(.5,b.reliability-d*.01)});this.data.skus.forEach((s,i)=>{const b=this.base.skus[i];s.dailyDemand=Math.round(b.dailyDemand*f);s.reorderPt=Math.round(b.reorderPt*r);s.stock=Math.max(0,Math.round(b.stock-d*b.dailyDemand*.3*f))})}kpis(){const d=this.data,af=d.customers.reduce((a,c)=>a+c.fillRate,0)/d.customers.length,tt=d.warehouses.reduce((a,w)=>a+w.throughput,0),ac=d.skus.reduce((a,s)=>a+s.stock*s.unitCost,0),so=d.skus.filter(s=>s.stock<=s.reorderPt*.3).length,al=d.suppliers.reduce((a,s)=>a+s.leadTime,0)/d.suppliers.length,ao=d.suppliers.reduce((a,s)=>a+s.reliability,0)/d.suppliers.length,au=d.warehouses.reduce((a,w)=>a+w.utilization,0)/d.warehouses.length;return{fill:(af*100).toFixed(1)+'%',tp:tt.toLocaleString(),cc:'$'+(ac/1000).toFixed(1)+'K',sr:((so/d.skus.length)*100).toFixed(1)+'%',lt:al.toFixed(1)+'d',ot:(ao*100).toFixed(1)+'%',sku:d.skus.length,ur:(au*100).toFixed(0)+'%'}}invData(){const labels=[],ds=[];for(let i=0;i<30;i++)labels.push('D'+(i+1));const colors=['#e8432a','#60a5fa','#34d399','#fbbf24'];this.data.skus.slice(0,4).forEach((sku,idx)=>{const pts=[];let st=sku.stock;for(let i=0;i<30;i++){st=Math.max(0,st-sku.dailyDemand+(Math.random()-.5)*sku.dailyDemand*.4);if(st<=sku.reorderPt)st+=sku.reorderPt*1.5;pts.push(Math.round(st))}ds.push({label:sku.name,data:pts,borderColor:colors[idx],backgroundColor:colors[idx]+'12',borderWidth:1.5,tension:.4,fill:false,pointRadius:0})});return{labels,datasets:ds}}tpData(){const labels=[],d1=[],d2=[];for(let i=0;i<30;i++){labels.push('D'+(i+1));d1.push(Math.round(this.data.warehouses[0].throughput+(Math.random()-.5)*this.data.warehouses[0].throughput*.2));d2.push(Math.round(this.data.warehouses[1].throughput+(Math.random()-.5)*this.data.warehouses[1].throughput*.2))}return{labels,datasets:[{label:'Dallas DC',data:d1,backgroundColor:'#e8432a80',borderColor:'#e8432a',borderWidth:1,borderRadius:3},{label:'Newark Hub',data:d2,backgroundColor:'#60a5fa80',borderColor:'#60a5fa',borderWidth:1,borderRadius:3}]}}}
+
+const E=new SimEngine(DATA);E.run();
+
+// ═══ LENIS SMOOTH SCROLL ═══
+const lenis=new Lenis({duration:1.2,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t)),touchMultiplier:2});
+function raf(time){lenis.raf(time);requestAnimationFrame(raf)}requestAnimationFrame(raf);
+lenis.on('scroll',ScrollTrigger.update);
+gsap.ticker.add(t=>lenis.raf(t*1000));
+gsap.ticker.lagSmoothing(0);
+
+// ═══ HERO CANVAS ═══
+(function(){const cv=document.getElementById('heroCanvas'),cx=cv.getContext('2d');let w,h,pts=[];function rs(){w=cv.width=window.innerWidth;h=cv.height=window.innerHeight}rs();window.addEventListener('resize',rs);for(let i=0;i<90;i++)pts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.5+.5});function draw(){cx.clearRect(0,0,w,h);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=w;if(p.x>w)p.x=0;if(p.y<0)p.y=h;if(p.y>h)p.y=0;cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle='rgba(232,67,42,0.3)';cx.fill()});for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<160){cx.beginPath();cx.moveTo(pts[i].x,pts[i].y);cx.lineTo(pts[j].x,pts[j].y);cx.strokeStyle=`rgba(232,67,42,${.06*(1-d/160)})`;cx.lineWidth=.5;cx.stroke()}}requestAnimationFrame(draw)}draw()})();
+
+// ═══ HERO ANIMATIONS (GSAP) ═══
+gsap.registerPlugin(ScrollTrigger);
+
+const heroTl=gsap.timeline({defaults:{ease:'power4.out'}});
+heroTl
+  .to('.hero-title .line-inner',{y:'0%',duration:1.4,stagger:.12},0.3)
+  .to('.hero-sub',{opacity:1,y:0,duration:1},{'>-0.6'})
+  .to('.hero-btns',{opacity:1,y:0,duration:1},{'>-0.7'})
+  .to('.hero-stats',{opacity:1,y:0,duration:1},{'>-0.7'});
+
+// ═══ SCROLL REVEALS ═══
+gsap.utils.toArray('.sr').forEach(el=>{
+  gsap.to(el,{scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'},opacity:1,y:0,duration:1,ease:'power3.out'});
+});
+gsap.utils.toArray('.sr-s').forEach(el=>{
+  gsap.to(el,{scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'},opacity:1,y:0,scale:1,duration:1.2,ease:'power3.out'});
+});
+
+// ═══ NAV SCROLL ═══
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('is-scrolled',window.scrollY>60));
+
+// ═══ NETWORK ═══
+(function(){const svg=document.getElementById('netSvg'),pos={},all=[];const sY=[60,140,220,300,380,455];DATA.suppliers.forEach((s,i)=>{pos[s.id]={x:90,y:sY[i]};all.push({...s,type:'supplier',x:90,y:sY[i]})});const wY=[190,340];DATA.warehouses.forEach((w,i)=>{pos[w.id]={x:350,y:wY[i]};all.push({...w,type:'warehouse',x:350,y:wY[i]})});const cY=[80,170,260,350,435];DATA.customers.forEach((c,i)=>{pos[c.id]={x:610,y:cY[i]};all.push({...c,type:'customer',x:610,y:cY[i]})});
+
+DATA.connections.forEach(cn=>{const f=pos[cn.from],t=pos[cn.to],mx=(f.x+t.x)/2;
+['edge','edge-glow'].forEach(cls=>{const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',`M${f.x},${f.y} C${mx},${f.y} ${mx},${t.y} ${t.x},${t.y}`);p.setAttribute('class',cls);svg.appendChild(p)})});
+
+[{x:90,y:25,t:'SUPPLIERS'},{x:350,y:25,t:'WAREHOUSES'},{x:610,y:25,t:'CUSTOMERS'}].forEach(l=>{const t=document.createElementNS('http://www.w3.org/2000/svg','text');t.setAttribute('x',l.x);t.setAttribute('y',l.y);t.setAttribute('class','n-col-label');t.textContent=l.t;svg.appendChild(t)});
+
+const nc={supplier:'#e8432a',warehouse:'#60a5fa',customer:'#34d399'};
+all.forEach(n=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','n-grp');g.setAttribute('data-id',n.id);const r=n.type==='warehouse'?20:14;
+const ring=document.createElementNS('http://www.w3.org/2000/svg','circle');ring.setAttribute('cx',n.x);ring.setAttribute('cy',n.y);ring.setAttribute('r',r+6);ring.setAttribute('fill','none');ring.setAttribute('stroke',nc[n.type]);ring.setAttribute('stroke-width','1.5');ring.setAttribute('opacity','0.25');ring.setAttribute('class','n-ring');g.appendChild(ring);
+const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx',n.x);c.setAttribute('cy',n.y);c.setAttribute('r',r);c.setAttribute('fill',nc[n.type]+'18');c.setAttribute('stroke',nc[n.type]);c.setAttribute('stroke-width','1.5');c.setAttribute('class','n-circle');g.appendChild(c);
+const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('cx',n.x);dot.setAttribute('cy',n.y);dot.setAttribute('r',3);dot.setAttribute('fill',nc[n.type]);g.appendChild(dot);
+const lb=document.createElementNS('http://www.w3.org/2000/svg','text');lb.setAttribute('x',n.x);lb.setAttribute('y',n.y+r+15);lb.setAttribute('class','n-label');lb.textContent=n.name;g.appendChild(lb);
+g.addEventListener('click',()=>showND(n));svg.appendChild(g)})})();
+
+function showND(n){document.getElementById('nodeDetail').style.display='block';document.getElementById('ndName').textContent=n.name;document.getElementById('ndType').textContent=n.type.toUpperCase();const s=document.getElementById('ndStats');let h='';if(n.type==='supplier'){const d=E.data.suppliers.find(x=>x.id===n.id);h=`<div><div class="nd-s-lbl">Lead Time</div><div class="nd-s-val">${d.leadTime}d</div></div><div><div class="nd-s-lbl">Reliability</div><div class="nd-s-val">${(d.reliability*100).toFixed(0)}%</div></div><div><div class="nd-s-lbl">Volume</div><div class="nd-s-val">${d.volume}/mo</div></div><div><div class="nd-s-lbl">Category</div><div class="nd-s-val">${d.category}</div></div>`}else if(n.type==='warehouse'){const d=E.data.warehouses.find(x=>x.id===n.id);h=`<div><div class="nd-s-lbl">Utilization</div><div class="nd-s-val">${(d.utilization*100).toFixed(0)}%</div></div><div><div class="nd-s-lbl">Throughput</div><div class="nd-s-val">${d.throughput}/d</div></div><div><div class="nd-s-lbl">Capacity</div><div class="nd-s-val">${(d.capacity/1000).toFixed(0)}K</div></div><div><div class="nd-s-lbl">Labor</div><div class="nd-s-val">${(d.laborAvail*100).toFixed(0)}%</div></div>`}else{const d=E.data.customers.find(x=>x.id===n.id);h=`<div><div class="nd-s-lbl">Fill Rate</div><div class="nd-s-val">${(d.fillRate*100).toFixed(1)}%</div></div><div><div class="nd-s-lbl">Demand</div><div class="nd-s-val">${d.demandUnits}/d</div></div><div><div class="nd-s-lbl">Region</div><div class="nd-s-val">${d.region}</div></div><div><div class="nd-s-lbl">Status</div><div class="nd-s-val" style="color:${d.fillRate>.93?'#34d399':'#fbbf24'}">${d.fillRate>.93?'Healthy':'At Risk'}</div></div>`}s.innerHTML=h}
+
+// ═══ SCENARIO ═══
+function runSim(){const dm=+document.getElementById('c-dem').value,dl=+document.getElementById('c-del').value,lb=+document.getElementById('c-lab').value,ro=+document.getElementById('c-reo').value;document.getElementById('v-dem').textContent=dm+'%';document.getElementById('v-del').textContent=dl+' days';document.getElementById('v-lab').textContent=lb+'%';document.getElementById('v-reo').textContent={1:'Conservative',2:'Standard',3:'Aggressive'}[ro];E.set({demand:dm,delay:dl,labor:lb,reorder:ro});updKPI();updCharts()}
+
+function updKPI(){const k=E.kpis();document.getElementById('k-fill').textContent=k.fill;document.getElementById('k-tp').textContent=k.tp;document.getElementById('k-cc').textContent=k.cc;document.getElementById('k-sr').textContent=k.sr;document.getElementById('k-lt').textContent=k.lt;document.getElementById('k-ot').textContent=k.ot;document.getElementById('k-sku').textContent=k.sku;document.getElementById('k-ur').textContent=k.ur}
+
+// ═══ CHARTS ═══
+const cDef={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6a7e',font:{family:'Inter',size:10},boxWidth:8,padding:12}}},scales:{x:{grid:{color:'#151e2a',drawBorder:false},ticks:{color:'#3a4a5e',font:{family:'JetBrains Mono',size:9},maxTicksLimit:10}},y:{grid:{color:'#151e2a',drawBorder:false},ticks:{color:'#3a4a5e',font:{family:'JetBrains Mono',size:9}}}}};
+
+let iC,tC;
+function initC(){iC=new Chart(document.getElementById('invChart'),{type:'line',data:E.invData(),options:{...cDef}});tC=new Chart(document.getElementById('tpChart'),{type:'bar',data:E.tpData(),options:{...cDef,scales:{...cDef.scales,x:{...cDef.scales.x,stacked:true},y:{...cDef.scales.y,stacked:true}}}})}
+function updCharts(){if(iC){iC.data=E.invData();iC.update('none')}if(tC){tC.data=E.tpData();tC.update('none')}}
+
+updKPI();initC();
 </script>
 </body>
 </html>
