@@ -1408,9 +1408,9 @@ gsap.registerPlugin(ScrollTrigger);
 const heroTl=gsap.timeline({defaults:{ease:'power4.out'}});
 heroTl
   .to('.hero-title .line-inner',{y:'0%',opacity:1,duration:1.4,stagger:.12,clearProps:'animation'},0.3)
-  .to('.hero-sub',{opacity:1,y:0,duration:1,clearProps:'animation'},{'>-0.6'})
-  .to('.hero-btns',{opacity:1,y:0,duration:1,clearProps:'animation'},{'>-0.7'})
-  .to('.hero-stats',{opacity:1,y:0,duration:1,clearProps:'animation'},{'>-0.7'});
+  .to('.hero-sub',{opacity:1,y:0,duration:1,clearProps:'animation'},'>-0.6')
+  .to('.hero-btns',{opacity:1,y:0,duration:1,clearProps:'animation'},'>-0.7')
+  .to('.hero-stats',{opacity:1,y:0,duration:1,clearProps:'animation'},'>-0.7');
 
 // ═══ SCROLL REVEALS ═══
 gsap.utils.toArray('.sr').forEach(el=>{
